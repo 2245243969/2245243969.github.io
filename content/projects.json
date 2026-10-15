@@ -1,0 +1,56 @@
+[
+  {
+    "slug": "snmp-arp",
+    "title": "SNMP ARP 表收集工具",
+    "repository": "snmp_arp_project",
+    "language": "Python",
+    "description": "基于 Python 的网络管理工具，通过 SNMP 协议收集网络设备的 ARP 表信息。",
+    "details": ["支持从 Excel 文件导入设备列表，批量收集 ARP 表及设备信息。", "提供 Tkinter 图形界面与命令行两种使用方式，采集结果可导出为 Excel。", "源代码、使用说明与运行要求见 GitHub 仓库。"],
+    "featured": true
+  },
+  {
+    "slug": "web-project",
+    "title": "Web 项目",
+    "repository": "web_for_compitition_project",
+    "language": "Vue",
+    "description": "使用 Vue 开发的 Web 项目。",
+    "details": ["项目源码公开在 GitHub，仓库名称为 web_for_compitition_project。", "项目内容与后续更新以 GitHub 仓库为准。"],
+    "featured": true
+  },
+  {
+    "slug": "python-code",
+    "title": "Python 代码集",
+    "repository": "Codes_Python",
+    "language": "Python",
+    "description": "Python 代码仓库。",
+    "details": ["收录在 Codes_Python 仓库中的代码，具体内容见 GitHub。"],
+    "featured": true
+  },
+  {
+    "slug": "cpp-code",
+    "title": "C++ 代码集",
+    "repository": "Codes_cpp",
+    "language": "C++",
+    "description": "C++ 代码仓库。",
+    "details": ["收录在 Codes_cpp 仓库中的代码，具体内容见 GitHub。"],
+    "featured": false
+  },
+  {
+    "slug": "c-code",
+    "title": "C 语言代码集",
+    "repository": "Codes_C",
+    "language": "C",
+    "description": "C 语言代码仓库。",
+    "details": ["收录在 Codes_C 仓库中的代码，具体内容见 GitHub。"],
+    "featured": false
+  },
+  {
+    "slug": "git-momo",
+    "title": "Git-MOMO",
+    "repository": "Git-MOMO",
+    "language": "C",
+    "description": "用于存放代码的公开仓库。",
+    "details": ["个人公开代码仓库，具体内容见 GitHub。"],
+    "featured": false
+  }
+]
