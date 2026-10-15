@@ -1,8 +1,12 @@
-# 张育玮的个人网站
+# 张育玮的个人主页
 
-按照参考站 https://polarlion.github.io/ 的左侧导航、右侧正文、黑白排版制作，使用你自己的个人信息、GitHub 头像与公开项目。保留深色主题和手机菜单，增加作品详情、博客分类和生活记录。
+按照参考站 https://polarlion.github.io/ 的左侧导航、右侧正文、黑白排版制作，使用个人信息和提供的照片。保留深色主题、手机菜单、博客分类和生活记录。
 
 个人介绍：东北财经大学2023年级大四在读生，人工智能专业。
+
+QQ 邮箱：[2245243969@qq.com](mailto:2245243969@qq.com)
+
+本次更新已移除全部作品栏目，换上个人提供的照片并添加 QQ 邮箱。
 
 ## 第一次发布到 GitHub Pages
 
@@ -37,14 +41,13 @@ python -m http.server 8000 --directory _site
 
 打开 http://localhost:8000/ 。预览时不用安装任何 Python 第三方依赖。
 
-## 修改个人信息与作品
+## 修改个人信息
 
-- `site.json`：姓名、介绍、GitHub 地址、正式网址、头像路径。
-- `assets/avatar.png`：你的 GitHub 头像快照，可以用自己的照片替换。
-- `content/projects.json`：作品名称、简介、详情、源码仓库和是否在首页精选。
+- `site.json`：姓名、介绍、QQ 邮箱、GitHub 地址、正式网址、照片路径。
+- `assets/avatar.jpg`：个人提供的照片，页面通过 CSS 调整显示区域。
 - `assets/style.css`：排版与响应式样式。
 
-公开项目依据 GitHub 仓库整理，不包含虚构的工作经历、论文、邮箱或获奖信息。网站尚未提供真实文章，所以博客与生活记录初始为空。
+博客与生活记录初始为空，发布真实文章后自动生成列表。
 
 ## 写一篇博客
 
@@ -77,3 +80,9 @@ draft: false
 视觉参考：https://polarlion.github.io/ 。页面布局与代码重新实现，未复制参考站的个人照片、履历、论文或文章。此版本无第三方运行时资源依赖，无访问统计脚本；网站内容可直接托管在 GitHub Pages。
 
 发布配置参考 GitHub 官方文档：https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages 。
+
+## 更新现有网站
+
+在仓库首页选择 Add file → Upload files，将更新包解压后的全部内容拖入，保持目录结构并提交到 main。确认 Settings → Pages → Source 为 GitHub Actions。在 Actions 等待 Deploy personal site to GitHub Pages 出现绿色勾后刷新网站。
+
+工作流只发布新构建的 `_site`，旧作品页不会进入新部署。仓库中旧的 `projects` 目录及 `content/projects.json` 若仍存在，可另外删除，保持源码整洁。

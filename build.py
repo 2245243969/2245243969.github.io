@@ -13,7 +13,6 @@ import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parent
 CONFIG = json.loads((ROOT / 'site.json').read_text(encoding='utf-8-sig'))
-PROJECTS = json.loads((ROOT / 'content/projects.json').read_text(encoding='utf-8-sig'))
 ESC = html.escape
 
 
@@ -151,7 +150,6 @@ def page(title: str, body: str, path: str, section: str, description: str | None
     nav = []
     for label, target, key in [
         ('Home', 'index.html', 'home'),
-        ('作品 · Projects', 'projects/index.html', 'projects'),
         ('博客 · Blog', 'post/index.html', 'blog'),
         ('生活 · Life', 'life/index.html', 'life'),
     ]:
@@ -184,8 +182,8 @@ def page(title: str, body: str, path: str, section: str, description: str | None
   <a class="skip-link" href="#main">跳转到正文</a>
   <header class="sidebar">
     <div class="intro">
-      <a class="avatar-link" href="{prefix}index.html" aria-label="{name}的首页"><img class="avatar" src="{prefix}{CONFIG['avatar']}" alt="{name}的 GitHub 头像" width="400" height="400"></a>
-      <div><p class="sidebar-description">{name}，{desc}</p><a class="sidebar-github" href="{CONFIG['github']}">GitHub · 2245243969</a></div>
+      <a class="avatar-link" href="{prefix}index.html" aria-label="{name}的首页"><img class="avatar" src="{prefix}{CONFIG['avatar']}" alt="{name}的照片" width="1706" height="1279"></a>
+      <div><p class="sidebar-description">{name}，{desc}</p><a class="sidebar-github" href="{CONFIG['github']}">GitHub · 2245243969</a><a class="sidebar-email" href="mailto:{ESC(CONFIG['email'], quote=True)}">{ESC(CONFIG['email'])}</a></div>
     </div>
     <nav class="navigation" aria-label="主导航">
       <button class="menu-button" id="menu-button" aria-expanded="false" aria-controls="navigation-list">菜单 · Menu <span data-menu-state aria-hidden="true">+</span></button>
@@ -196,21 +194,13 @@ def page(title: str, body: str, path: str, section: str, description: str | None
     <main id="main" tabindex="-1">{body}</main>
     <footer class="footer">
       <label class="theme-label" for="themer">dark theme: <input type="checkbox" id="themer" aria-label="深色主题"><span id="theme-state" aria-hidden="true">off</span></label>
-      <p>{name} · <a href="{CONFIG['github']}">GitHub</a> · <a href="{prefix}feed.xml">RSS</a></p>
-      <p class="footer-note">个人主页 · 作品与记录</p>
+      <p>{name} · <a href="{CONFIG['github']}">GitHub</a> · <a href="mailto:{ESC(CONFIG['email'], quote=True)}">QQ 邮箱</a> · <a href="{prefix}feed.xml">RSS</a></p>
+      <p class="footer-note">个人主页 · 学习与生活</p>
     </footer>
   </div></div>
 </body>
 </html>
 '''
-
-
-def project_list(projects: list[dict], prefix: str, full: bool = False) -> str:
-    rows = []
-    for item in projects:
-        rows.append(f'''<li><a class="project-title" href="{prefix}projects/{item['slug']}/index.html">{ESC(item['title'])}</a>
-<p>{ESC(item['description'])}</p><p class="meta">{ESC(item['language'])} · <a href="{CONFIG['github']}/{item['repository']}">GitHub</a></p></li>''')
-    return '<ul class="project-list' + (' project-list-full' if full else '') + '">' + ''.join(rows) + '</ul>'
 
 
 def post_list(posts: list[dict], prefix: str) -> str:
@@ -231,19 +221,11 @@ def build(destination: Path) -> None:
     home = f'''<h1>{ESC(CONFIG['name'])}</h1>
 <p class="bio">{ESC(CONFIG['description'])}</p>
 <p>GitHub：<a href="{CONFIG['github']}">github.com/2245243969</a></p>
-<h2>个人作品：</h2>
-{project_list([item for item in PROJECTS if item.get('featured')], '')}
-<p class="section-link"><a href="projects/index.html">查看全部作品 →</a></p>
+<p>QQ 邮箱：<a href="mailto:{ESC(CONFIG['email'], quote=True)}">{ESC(CONFIG['email'])}</a></p>
 <h2>博客与生活：</h2>
 {post_list(posts[:3], '') if posts else '<p class="muted">学习笔记与生活记录，陆续更新。</p>'}
 <p class="section-link"><a href="post/index.html">浏览博客 →</a> &nbsp; <a href="life/index.html">生活记录 →</a></p>'''
     pages['index.html'] = (CONFIG['name'], home, 'home')
-    pages['projects/index.html'] = ('个人作品', '<h1>个人作品</h1><p>GitHub 上的项目与代码。</p>' + project_list(PROJECTS, '../', True), 'projects')
-    for project in PROJECTS:
-        body = f'''<a class="back-link" href="../index.html">← 全部作品</a><h1>{ESC(project['title'])}</h1><p class="meta">{ESC(project['language'])} · {ESC(project['repository'])}</p><p>{ESC(project['description'])}</p>'''
-        body += ''.join('<p class="detail-paragraph">' + ESC(detail) + '</p>' for detail in project['details'])
-        body += f'<p class="repository-link"><a href="{CONFIG["github"]}/{project["repository"]}">在 GitHub 查看项目 →</a></p>'
-        pages[f'projects/{project["slug"]}/index.html'] = (project['title'], body, 'projects')
     blog_filters = [('全部', 'post/index.html'), ('学习笔记', 'post/study/index.html'), ('生活随笔', 'life/index.html')]
     for path, title, selected, category in [
         ('post/index.html', '博客', 'blog', None),
