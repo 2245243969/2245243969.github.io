@@ -1,0 +1,49 @@
+{
+  "authors": [
+    {"name": "Chen Zhang", "email": "zhangch@pku.edu.cn"},
+    {"name": "Xiao Liu", "email": "lxlisa@pku.edu.cn"},
+    {"name": "Jiuheng Lin", "email": "linjiuheng@stu.pku.edu.cn"},
+    {"name": "Yansong Feng", "email": "fengyansong@pku.edu.cn"}
+  ],
+  "venue": "Findings of the Association for Computational Linguistics: ACL 2024",
+  "publication_details": "2024 年 8 月 / August 2024 · pp. 8783–8800 · Association for Computational Linguistics",
+  "links": [
+    {"label": "论文主页 / ACL Anthology", "url": "https://aclanthology.org/2024.findings-acl.519/"},
+    {"label": "PDF", "url": "https://aclanthology.org/2024.findings-acl.519.pdf"},
+    {"label": "DOI: 10.18653/v1/2024.findings-acl.519", "url": "https://doi.org/10.18653/v1/2024.findings-acl.519"}
+  ],
+  "keywords": [
+    {"zh": "大语言模型", "en": "Large Language Models"},
+    {"zh": "低资源机器翻译", "en": "Low-Resource Machine Translation"},
+    {"zh": "上下文学习", "en": "In-Context Learning"},
+    {"zh": "词典增强提示", "en": "Dictionary-Augmented Prompting"},
+    {"zh": "双语词典归纳", "en": "Bilingual Lexicon Induction"},
+    {"zh": "同义词扩展", "en": "Synonym Expansion"},
+    {"zh": "示例检索", "en": "Exemplar Retrieval"},
+    {"zh": "壮语", "en": "Zhuang"},
+    {"zh": "DIPMT++", "en": "DIPMT++"}
+  ],
+  "figures": {
+    "figure1": {
+      "id": "figure-1", "image": "assets/images/teaching-unseen-language/figure-1.png", "width": 937, "height": 904,
+      "caption": "Figure 1：使用 DIPMT++ 翻译壮语句子的示例。",
+      "caption_en": "Figure 1: An example of translating a Zhuang sentence with DIPMT++.",
+      "source": "https://aclanthology.org/2024.findings-acl.519/", "locator": "Figure 1 · PDF p. 1 / 论文第 8783 页"
+    },
+    "table11": {
+      "id": "table-11", "image": "assets/images/teaching-unseen-language/table-11.png", "width": 1896, "height": 1088,
+      "caption": "Table 11：DIPMT++ 使用的提示模板；斜体为中文指令的英文翻译。",
+      "caption_en": "Table 11: Prompt templates used by DIPMT++. The text in italics are the English translations of the Chinese instructions.",
+      "source": "https://aclanthology.org/2024.findings-acl.519/", "locator": "Table 11 · PDF p. 16 / 论文第 8798 页"
+    }
+  },
+  "references": [
+    {"id": "ghazvininejad-2023", "authors": "Marjan Ghazvininejad, Hila Gonen, and Luke Zettlemoyer", "year": "2023", "title": "Dictionary-based Phrase-level Prompting of Large Language Models for Machine Translation", "publication": "arXiv preprint arXiv:2302.07856", "url": "https://arxiv.org/abs/2302.07856"},
+    {"id": "och-ney-2003", "authors": "Franz Josef Och and Hermann Ney", "year": "2003", "title": "A Systematic Comparison of Various Statistical Alignment Models", "publication": "Computational Linguistics, 29(1):19–51", "url": "https://aclanthology.org/J03-1002/"},
+    {"id": "robertson-2009", "authors": "Stephen Robertson and Hugo Zaragoza", "year": "2009", "title": "The Probabilistic Relevance Framework: BM25 and Beyond", "publication": "Foundations and Trends in Information Retrieval, 3(4):333–389", "url": "https://doi.org/10.1561/1500000019"}
+  ],
+  "handwritten": [
+    {"id": "handwritten-1", "image": "assets/images/teaching-unseen-language/handwritten-1.jpg", "width": 1280, "height": 1707, "caption": "手稿原图，第 1 页。", "caption_en": "Original handwritten notes, page 1."},
+    {"id": "handwritten-2", "image": "assets/images/teaching-unseen-language/handwritten-2.jpg", "width": 1280, "height": 1707, "caption": "手稿原图，第 2 页。", "caption_en": "Original handwritten notes, page 2."}
+  ]
+}

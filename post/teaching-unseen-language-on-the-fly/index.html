@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Teaching Large Language Models an Unseen Language on the Fly | 张育玮 · Yuwei Zhang</title>
+  <meta name="description" content="东北财经大学2023年级大四在读生，人工智能专业。 A fourth-year undergraduate student majoring in Artificial Intelligence at Dongbei University of Finance and Economics (2023 intake).">
+  <meta name="theme-color" content="#fefefe">
+  <meta property="og:title" content="Teaching Large Language Models an Unseen Language on the Fly | 张育玮 · Yuwei Zhang">
+  <meta property="og:type" content="website">
+  <meta property="og:description" content="东北财经大学2023年级大四在读生，人工智能专业。 A fourth-year undergraduate student majoring in Artificial Intelligence at Dongbei University of Finance and Economics (2023 intake).">
+  <meta property="og:url" content="https://2245243969.github.io/post/teaching-unseen-language-on-the-fly/">
+  <link rel="canonical" href="https://2245243969.github.io/post/teaching-unseen-language-on-the-fly/">
+  <link rel="icon" href="../../assets/favicon.svg?v=67845ef411f0" type="image/svg+xml">
+  <link rel="alternate" type="application/rss+xml" title="张育玮的博客 · Yuwei Zhang's Blog" href="../../feed.xml">
+  <script src="../../assets/theme.js?v=011042463fd3"></script>
+  <link rel="stylesheet" href="../../assets/style.css?v=197424d95bf8">
+  <script src="../../assets/main.js?v=9d21c85f7b1a" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳转到正文 · <span lang="en">Skip to content</span></a>
+  <header class="sidebar">
+    <div class="intro">
+      <a class="avatar-link" href="../../" data-home-link aria-label="张育玮的首页 · Yuwei Zhang's home"><img class="avatar" src="../../assets/avatar.jpg?v=112182ad06eb" alt="张育玮的照片 · Photo of Yuwei Zhang" width="1706" height="1279"></a>
+      <div><p class="sidebar-description">张育玮，东北财经大学2023年级大四在读生，人工智能专业。</p><p class="sidebar-description-en" lang="en">Yuwei Zhang. A fourth-year undergraduate student majoring in Artificial Intelligence at Dongbei University of Finance and Economics (2023 intake).</p><a class="sidebar-github" href="https://github.com/2245243969">GitHub · 2245243969</a><a class="sidebar-email" href="mailto:2245243969@qq.com" aria-label="QQ 邮箱 · QQ Email: 2245243969@qq.com">2245243969@qq.com</a><a class="sidebar-bilibili" href="https://space.bilibili.com/289847537?spm_id_from=333.1007.0.0" target="_blank" rel="noopener noreferrer">B站主页 · <span lang="en">Bilibili</span></a></div>
+    </div>
+    <nav class="navigation" aria-label="主导航 · Main navigation">
+      <button class="menu-button" id="menu-button" aria-expanded="false" aria-controls="navigation-list">菜单 · Menu <span data-menu-state aria-hidden="true">+</span></button>
+      <ul id="navigation-list"><li><a href="../../" data-home-link><svg class="bookmark" viewBox="0 0 10 14" aria-hidden="true"><path d="M1 1h8v11l-4-3-4 3Z"/></svg><span class="nav-text">主页 · <span lang="en">Home</span></span></a></li><li><a href="../../post/index.html" aria-current="page"><svg class="bookmark" viewBox="0 0 10 14" aria-hidden="true"><path d="M1 1h8v11l-4-3-4 3Z"/></svg><span class="nav-text">博客 · <span lang="en">Blog</span></span></a></li><li><a href="../../life/index.html"><svg class="bookmark" viewBox="0 0 10 14" aria-hidden="true"><path d="M1 1h8v11l-4-3-4 3Z"/></svg><span class="nav-text">生活 · <span lang="en">Life</span></span></a></li></ul>
+    </nav>
+  </header>
+  <div class="main-and-footer"><div class="page">
+    <main id="main" tabindex="-1"><a class="back-link" href="../index.html">← 返回文章列表 · <span lang="en">Back to Articles</span></a><article class="article"><h1>Teaching Large Language Models an Unseen Language on the Fly</h1><p class="meta"><time datetime="2026-10-25">2026-10-25</time> · 学习笔记 · <span lang="en">Study Notes</span></p><section class="paper-details" aria-label="论文信息 · Paper information"><dl class="paper-metadata"><dt>作者 · <span lang="en">Authors</span></dt><dd>Chen Zhang · Xiao Liu · Jiuheng Lin · Yansong Feng<br>北京大学 · <span lang="en">Peking University</span><br><span class="meta">通讯作者 · <span lang="en">Corresponding author</span>：Yansong Feng</span></dd><dt>作者邮箱 · <span lang="en">Author emails</span></dt><dd><ul class="author-emails"><li>Chen Zhang：<a href="mailto:zhangch@pku.edu.cn">zhangch@pku.edu.cn</a></li><li>Xiao Liu：<a href="mailto:lxlisa@pku.edu.cn">lxlisa@pku.edu.cn</a></li><li>Jiuheng Lin：<a href="mailto:linjiuheng@stu.pku.edu.cn">linjiuheng@stu.pku.edu.cn</a></li><li>Yansong Feng：<a href="mailto:fengyansong@pku.edu.cn">fengyansong@pku.edu.cn</a></li></ul></dd><dt>发表信息 · <span lang="en">Publication</span></dt><dd><span lang="en">Findings of the Association for Computational Linguistics: ACL 2024</span><br>2024 年 8 月 / August 2024 · pp. 8783–8800 · Association for Computational Linguistics</dd><dt>链接 · <span lang="en">Links</span></dt><dd><a href="https://aclanthology.org/2024.findings-acl.519/">论文主页 / ACL Anthology</a> · <a href="https://aclanthology.org/2024.findings-acl.519.pdf">PDF</a> · <a href="https://doi.org/10.18653/v1/2024.findings-acl.519">DOI: 10.18653/v1/2024.findings-acl.519</a></dd><dt>关键词 · <span lang="en">Keywords</span></dt><dd><ul class="paper-keywords"><li>大语言模型<span lang="en"> / Large Language Models</span></li><li>低资源机器翻译<span lang="en"> / Low-Resource Machine Translation</span></li><li>上下文学习<span lang="en"> / In-Context Learning</span></li><li>词典增强提示<span lang="en"> / Dictionary-Augmented Prompting</span></li><li>双语词典归纳<span lang="en"> / Bilingual Lexicon Induction</span></li><li>同义词扩展<span lang="en"> / Synonym Expansion</span></li><li>示例检索<span lang="en"> / Exemplar Retrieval</span></li><li>壮语<span lang="en"> / Zhuang</span></li><li>DIPMT++</li></ul></dd></dl></section><section class="notes-original" aria-labelledby="notes-title"><h2 id="notes-title">笔记正文 · <span lang="en">Notes</span></h2><p>2026/10/25 16:57</p>
+<p>《Teaching Large Language Models an Unseen Language on the Fly》</p>
+<p>考虑到 LLMs 强大的归纳和模仿能力，作者提出了一个有趣的问题：LLMs 可以只通过实时的 prompt 提问下学会翻译低资源问题吗？</p>
+<p>这篇文章主要基于前人的工作 DIPMT (Ghazvininejad et al., 2023)。前人已经探索了通过 prompting 来翻译低资源语言，用字典中的信息来提供稀有单词的翻译。但是，DIPMT 是专用于已经有基础能力的 LLMs 身上的。对于完新的语言来说就是大问题了。</p>
+<h2>Preliminary: DIPMT</h2>
+<p>DIPMT 是一个基于 prompt 的方法，用于低资源语言的翻译。给定一个句子，该 model 会在字典中查找各种稀有单词的意思，并直接将其加入到 prompt 中，形式为：<em>in this context, the word &quot;[source word]&quot; means &quot;[target word]&quot;</em>. 该技巧采用 in-context learning 的方式，即在当前待测试样本之前放入 k 个示例。但原论文有提到说：当目前的 model 性能小于 10 BLEU points 时，该方法并不适用。</p>
+<p>作者提出了一个假设：考虑到 LLMs 强大的推理和模仿能力，根据假设只通过 prompt，我们是可以教会 LLMs 翻译其还没有见过的语言的。</p>
+<p>该论文提出了 DIPMT++，该 model 在 DIPMT 上做了两个关键的修改。</p>
+<figure class="paper-figure" id="figure-1"><div class="figure-image"><img src="../../assets/images/teaching-unseen-language/figure-1.png?v=25b06b7cb717" alt="Figure 1：使用 DIPMT++ 翻译壮语句子的示例。 / Figure 1: An example of translating a Zhuang sentence with DIPMT++." width="937" height="904" loading="lazy"></div><figcaption>Figure 1：使用 DIPMT++ 翻译壮语句子的示例。<span class="translation" lang="en">Figure 1: An example of translating a Zhuang sentence with DIPMT++.</span><span class="figure-source"><a href="https://aclanthology.org/2024.findings-acl.519/">Zhang et al. (2024)</a> · Figure 1 · PDF p. 1 / 论文第 8783 页 · <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></span></figcaption></figure>
+<h2>第一点是，提升词汇覆盖率 (Improved Lexical Coverage)</h2>
+<p>DIPMT 是提供 rare words 的翻译，但是，对于没有见过的低资源语言，提供的翻译越多越好，但是词典中没有足够多的词，故需要其他方法来解决这个问题。DIPMT++ 通过 traditional 统计方法和语言资源来解决该问题。</p>
+<ul>
+<li>模糊匹配 (Fuzzy Matching)：对于 LRLs，我们缺少形态分析工具，故用正向 or 逆向最大匹配等字符串算法可快速从词典中找到可能相关的词条。</li>
+<li>双语词典归纳 (Bilingual Lexicon Induction)：平行语料库也可能包含字典未收录的词，GIZA++ (Och and Ney, 2003) 等 traditional statistical methods 可高效地从语料库中挖掘双语词汇对，从而补充现有词典。</li>
+<li>同义词扩展 (Synonym Expansion)：通过将同义词列表加入字典，可缓解高资源语言的词库不是总可以在 dictionary 找到对应译词的问题。</li>
+</ul>
+<h2>第二点是，融入句法信息的示例 (Syntactically-Informed Exemplar)</h2>
+<p>DIPMT++ try to 动态选择相关性更高的样例，并 guide model 从中推断出基本的句法信息。对于每个测试样本使用与语言无关的检索算法 BM25 (Robertson et al., 2009) 来检索示例。</p>
+<figure class="paper-figure" id="table-11"><div class="figure-image"><img src="../../assets/images/teaching-unseen-language/table-11.png?v=0da86a2c2042" alt="Table 11：DIPMT++ 使用的提示模板；斜体为中文指令的英文翻译。 / Table 11: Prompt templates used by DIPMT++. The text in italics are the English translations of the Chinese instructions." width="1896" height="1088" loading="lazy"></div><figcaption>Table 11：DIPMT++ 使用的提示模板；斜体为中文指令的英文翻译。<span class="translation" lang="en">Table 11: Prompt templates used by DIPMT++. The text in italics are the English translations of the Chinese instructions.</span><span class="figure-source"><a href="https://aclanthology.org/2024.findings-acl.519/">Zhang et al. (2024)</a> · Table 11 · PDF p. 16 / 论文第 8798 页 · <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></span></figcaption></figure></section><section class="paper-references" aria-labelledby="references-title"><h2 id="references-title">参考文献 · <span lang="en">References</span></h2><ol><li id="ref-ghazvininejad-2023">Marjan Ghazvininejad, Hila Gonen, and Luke Zettlemoyer. 2023. <a href="https://arxiv.org/abs/2302.07856">Dictionary-based Phrase-level Prompting of Large Language Models for Machine Translation</a>. arXiv preprint arXiv:2302.07856.</li><li id="ref-och-ney-2003">Franz Josef Och and Hermann Ney. 2003. <a href="https://aclanthology.org/J03-1002/">A Systematic Comparison of Various Statistical Alignment Models</a>. Computational Linguistics, 29(1):19–51.</li><li id="ref-robertson-2009">Stephen Robertson and Hugo Zaragoza. 2009. <a href="https://doi.org/10.1561/1500000019">The Probabilistic Relevance Framework: BM25 and Beyond</a>. Foundations and Trends in Information Retrieval, 3(4):333–389.</li></ol></section><section class="handwritten-originals" aria-labelledby="handwritten-title"><h2 id="handwritten-title">手稿原图 · <span lang="en">Original Handwritten Notes</span></h2><figure class="paper-figure" id="handwritten-1"><div class="figure-image"><img src="../../assets/images/teaching-unseen-language/handwritten-1.jpg?v=34121f5d87d5" alt="手稿原图，第 1 页。 / Original handwritten notes, page 1." width="1280" height="1707" loading="lazy"></div><figcaption>手稿原图，第 1 页。<span class="translation" lang="en">Original handwritten notes, page 1.</span></figcaption></figure><figure class="paper-figure" id="handwritten-2"><div class="figure-image"><img src="../../assets/images/teaching-unseen-language/handwritten-2.jpg?v=6ca72af701ca" alt="手稿原图，第 2 页。 / Original handwritten notes, page 2." width="1280" height="1707" loading="lazy"></div><figcaption>手稿原图，第 2 页。<span class="translation" lang="en">Original handwritten notes, page 2.</span></figcaption></figure></section></article></main>
+    <footer class="footer">
+      <label class="theme-label" for="themer">深色主题 · <span lang="en">Dark theme:</span> <input type="checkbox" id="themer" aria-label="深色主题 · Dark theme"><span id="theme-state" aria-hidden="true">关 · Off</span></label>
+      <p>张育玮 <span lang="en">/ Yuwei Zhang</span> · <a href="https://github.com/2245243969">GitHub</a> · <a href="mailto:2245243969@qq.com">QQ 邮箱 · <span lang="en">QQ Email</span></a> · <a href="https://space.bilibili.com/289847537?spm_id_from=333.1007.0.0" target="_blank" rel="noopener noreferrer">B站主页 · <span lang="en">Bilibili</span></a> · <a href="../../feed.xml">RSS</a></p>
+      <p class="footer-note">个人主页 · 学习与生活<span class="translation" lang="en">Personal Website · Learning &amp; Life</span></p>
+    </footer>
+  </div></div>
+</body>
+</html>

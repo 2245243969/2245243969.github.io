@@ -76,7 +76,7 @@ def inline(value: str, prefix: str = '') -> str:
     return value
 
 
-def markdown(source: str, prefix: str) -> str:
+def markdown(source: str, prefix: str, figures: dict | None = None) -> str:
     """Render the documented Markdown subset; source HTML is escaped."""
     result: list[str] = []
     paragraph: list[str] = []
@@ -106,6 +106,14 @@ def markdown(source: str, prefix: str) -> str:
             continue
         if code is not None:
             code.append(line)
+            continue
+        figure = re.fullmatch(r'\{\{figure:([a-zA-Z0-9_-]+)\}\}', line.strip())
+        if figure:
+            flush()
+            end_list()
+            if not figures or figure[1] not in figures:
+                raise ValueError('Unknown figure: ' + figure[1])
+            result.append(paper_figure(figures[figure[1]], prefix))
             continue
         if not line.strip():
             flush()
@@ -164,8 +172,37 @@ def load_posts() -> list[dict]:
             raise ValueError(f'{source.name}: category must be 学习笔记 or 生活随笔')
         if not re.fullmatch(r'[a-zA-Z0-9][a-zA-Z0-9_-]*', source.stem):
             raise ValueError(f'{source.name}: use an English filename, such as my-first-post.md')
-        posts.append({**meta, 'slug': source.stem, 'body': parts[2].strip()})
+        paper_path = source.with_suffix('.json')
+        paper = json.loads(paper_path.read_text(encoding='utf-8-sig')) if paper_path.exists() else None
+        posts.append({**meta, 'slug': source.stem, 'body': parts[2].strip(), 'paper': paper})
     return sorted(posts, key=lambda post: (post['date'], post['slug']), reverse=True)
+
+
+def paper_figure(figure: dict, prefix: str) -> str:
+    relative = figure['image'].lstrip('/')
+    version = hashlib.sha256((ROOT / relative).read_bytes()).hexdigest()[:12]
+    src = ESC(prefix + relative + '?v=' + version, quote=True)
+    caption = ESC(figure['caption'])
+    caption_en = ESC(figure['caption_en'])
+    source = ''
+    if figure.get('source'):
+        source = '<span class="figure-source"><a href="' + ESC(figure['source'], quote=True) + '">Zhang et al. (2024)</a> · ' + ESC(figure['locator']) + ' · <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></span>'
+    return f'''<figure class="paper-figure" id="{ESC(figure['id'], quote=True)}"><div class="figure-image"><img src="{src}" alt="{caption} / {caption_en}" width="{figure['width']}" height="{figure['height']}" loading="lazy"></div><figcaption>{caption}<span class="translation" lang="en">{caption_en}</span>{source}</figcaption></figure>'''
+
+
+def paper_metadata(paper: dict) -> str:
+    names = ' · '.join(ESC(author['name']) for author in paper['authors'])
+    emails = ''.join('<li>' + ESC(author['name']) + '：<a href="mailto:' + ESC(author['email'], quote=True) + '">' + ESC(author['email']) + '</a></li>' for author in paper['authors'])
+    links = ' · '.join('<a href="' + ESC(link['url'], quote=True) + '">' + ESC(link['label']) + '</a>' for link in paper['links'])
+    keywords = ''.join('<li>' + ESC(item['zh']) + ('<span lang="en"> / ' + ESC(item['en']) + '</span>' if item['zh'] != item['en'] else '') + '</li>' for item in paper['keywords'])
+    return f'''<section class="paper-details" aria-label="论文信息 · Paper information"><dl class="paper-metadata"><dt>作者 · <span lang="en">Authors</span></dt><dd>{names}<br>北京大学 · <span lang="en">Peking University</span><br><span class="meta">通讯作者 · <span lang="en">Corresponding author</span>：Yansong Feng</span></dd><dt>作者邮箱 · <span lang="en">Author emails</span></dt><dd><ul class="author-emails">{emails}</ul></dd><dt>发表信息 · <span lang="en">Publication</span></dt><dd><span lang="en">{ESC(paper['venue'])}</span><br>{ESC(paper['publication_details'])}</dd><dt>链接 · <span lang="en">Links</span></dt><dd>{links}</dd><dt>关键词 · <span lang="en">Keywords</span></dt><dd><ul class="paper-keywords">{keywords}</ul></dd></dl></section>'''
+
+
+def paper_references(paper: dict) -> str:
+    entries = []
+    for reference in paper['references']:
+        entries.append('<li id="ref-' + ESC(reference['id'], quote=True) + '">' + ESC(reference['authors']) + '. ' + ESC(reference['year']) + '. <a href="' + ESC(reference['url'], quote=True) + '">' + ESC(reference['title']) + '</a>. ' + ESC(reference['publication']) + '.</li>')
+    return '<section class="paper-references" aria-labelledby="references-title"><h2 id="references-title">参考文献 · <span lang="en">References</span></h2><ol>' + ''.join(entries) + '</ol></section>'
 
 
 def page(title: str, body: str, path: str, section: str, description: str | None = None) -> str:
@@ -245,7 +282,8 @@ def post_list(posts: list[dict], prefix: str) -> str:
         return '<div class="empty"><p>还没有发布文章。<span class="translation" lang="en">No articles have been published yet.</span></p><p>学习笔记与生活记录，陆续更新。<span class="translation" lang="en">Study notes and life journals, with more to come.</span></p></div>'
     rows = []
     for post in posts:
-        rows.append(f'''<li><h2 class="post-title"><a href="{prefix}post/{post['slug']}/index.html">{ESC(post['title'])}</a></h2><p class="meta"><time datetime="{post['date']}">{post['date']}</time> · {bilingual(post['category'])}</p><p>{ESC(post.get('summary', ''))}</p></li>''')
+        summary_en = '<span class="translation" lang="en">' + ESC(post['summary_en']) + '</span>' if post.get('summary_en') else ''
+        rows.append(f'''<li><h2 class="post-title"><a href="{prefix}post/{post['slug']}/index.html">{ESC(post['title'])}</a></h2><p class="meta"><time datetime="{post['date']}">{post['date']}</time> · {bilingual(post['category'])}</p><p>{ESC(post.get('summary', ''))}{summary_en}</p></li>''')
     return '<ul class="post-list">' + ''.join(rows) + '</ul>'
 
 
@@ -278,7 +316,12 @@ def build(destination: Path) -> None:
     for post in posts:
         section = 'life' if post['category'] == '生活随笔' else 'blog'
         parent = '../../life/index.html' if section == 'life' else '../index.html'
-        body = f'<a class="back-link" href="{parent}">← {bilingual("返回文章列表")}</a><article class="article"><h1>{ESC(post["title"])}</h1><p class="meta"><time datetime="{post["date"]}">{post["date"]}</time> · {bilingual(post["category"])}</p>' + markdown(post['body'], '../../') + '</article>'
+        paper = post.get('paper')
+        content = markdown(post['body'], '../../', paper.get('figures') if paper else None)
+        if paper:
+            originals = ''.join(paper_figure(figure, '../../') for figure in paper['handwritten'])
+            content = paper_metadata(paper) + '<section class="notes-original" aria-labelledby="notes-title"><h2 id="notes-title">笔记正文 · <span lang="en">Notes</span></h2>' + content + '</section>' + paper_references(paper) + '<section class="handwritten-originals" aria-labelledby="handwritten-title"><h2 id="handwritten-title">手稿原图 · <span lang="en">Original Handwritten Notes</span></h2>' + originals + '</section>'
+        body = f'<a class="back-link" href="{parent}">← {bilingual("返回文章列表")}</a><article class="article"><h1>{ESC(post["title"])}</h1><p class="meta"><time datetime="{post["date"]}">{post["date"]}</time> · {bilingual(post["category"])}</p>' + content + '</article>'
         pages[f'post/{post["slug"]}/index.html'] = (post['title'], body, section)
     pages['404.html'] = ('页面未找到', '<h1>' + bilingual('页面未找到') + '</h1><p>这个页面可能已经移动，或链接有误。</p><p class="translation" lang="en">This page may have moved, or the link may be incorrect.</p><p><a href="' + CONFIG['url'] + '/">' + bilingual('返回首页') + ' →</a></p>', '')
     for path, (title, body, section) in pages.items():
