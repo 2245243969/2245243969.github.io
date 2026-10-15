@@ -46,7 +46,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .bookmark { width: .5rem; height: .65rem; flex: 0 0 auto; fill: none; stroke: currentColor; stroke-width: 1.1; }
 .menu-button { display: none; }
 .main-and-footer { margin-left: 15rem; }
-.page { max-width: 40rem; padding: 2.25rem; margin: 0 auto; }
+.page { max-width: 48rem; padding: 2.25rem; margin: 0 auto; }
 main { min-height: 27rem; font-size: .85rem; }
 h1, h2, h3 { font-family: "Times New Roman", "Songti SC", "SimSun", serif; line-height: 1.25; color: var(--ink); }
 h1 { font-size: 2rem; margin: 0 0 1.65rem; }
@@ -60,8 +60,8 @@ p { margin: .7rem 0; }
 .meta { font-size: .75rem; margin: .2rem 0 .5rem; }
 .section-link { font-size: .75rem; margin: 1rem 0; }
 .back-link { display: inline-block; margin: 0 0 1.6rem; font-size: .75rem; }
-.filters { display: flex; flex-wrap: wrap; gap: .4rem; padding: 0; margin: 1.5rem 0 2rem; list-style: none; }
-.filters a { display: block; padding: .25rem .6rem; border: 1px solid transparent; text-decoration: none; }
+.filters { display: flex; flex-wrap: wrap; gap: .35rem; padding: 0; margin: 1.5rem 0 2rem; list-style: none; font-size: .8rem; }
+.filters a { display: block; padding: .25rem .45rem; border: 1px solid transparent; text-decoration: none; white-space: nowrap; }
 .filters a[aria-current="page"] { border-color: var(--ink); }
 .filters a:hover { text-decoration: underline; }
 .empty { margin: 2.5rem 0 4rem; padding: 1.5rem 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
@@ -103,7 +103,6 @@ pre code { padding: 0; }
 .footer p { margin: .8rem 0 0; }
 .footer-note { color: var(--muted); font-size: .62rem; }
 .footer-note .translation { font-size: 1em; }
-@media (min-width: 1650px) { .page { margin-left: 4.5rem; } }
 @media (max-width: 900px) {
   :root { font-size: 18px; }
   .sidebar { width: 12rem; padding: 1.5rem; }
