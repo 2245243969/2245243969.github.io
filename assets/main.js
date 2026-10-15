@@ -9,7 +9,7 @@ const themeState = document.querySelector('#theme-state');
 function updateTheme(dark) {
   document.documentElement.dataset.theme = dark ? 'dark' : 'light';
   if (themeSwitch) themeSwitch.checked = dark;
-  if (themeState) themeState.textContent = dark ? 'on' : 'off';
+  if (themeState) themeState.textContent = dark ? '开 · On' : '关 · Off';
 }
 updateTheme(document.documentElement.dataset.theme === 'dark');
 themeSwitch?.addEventListener('change', () => {

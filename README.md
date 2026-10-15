@@ -6,7 +6,9 @@
 
 QQ 邮箱：[2245243969@qq.com](mailto:2245243969@qq.com)
 
-本次更新已移除全部作品栏目，换上个人提供的照片并添加 QQ 邮箱。
+B站主页 / Bilibili：https://space.bilibili.com/289847537?spm_id_from=333.1007.0.0
+
+当前版本已移除全部作品栏目，使用个人提供的照片，添加 QQ 邮箱和 B 站链接。现有页面的个人介绍、导航、页面标题、提示、分类和页脚采用中英对照。
 
 ## 第一次发布到 GitHub Pages
 
@@ -43,7 +45,7 @@ python -m http.server 8000 --directory _site
 
 ## 修改个人信息
 
-- `site.json`：姓名、介绍、QQ 邮箱、GitHub 地址、正式网址、照片路径。
+- `site.json`：中文姓名 `name`、英文姓名 `name_en`、中文介绍 `description`、英文介绍 `description_en`、QQ 邮箱 `email`、B站地址 `bilibili`、GitHub 地址、正式网址、照片路径。
 - `assets/avatar.jpg`：个人提供的照片，页面通过 CSS 调整显示区域。
 - `assets/style.css`：排版与响应式样式。
 
@@ -86,3 +88,7 @@ draft: false
 在仓库首页选择 Add file → Upload files，将更新包解压后的全部内容拖入，保持目录结构并提交到 main。确认 Settings → Pages → Source 为 GitHub Actions。在 Actions 等待 Deploy personal site to GitHub Pages 出现绿色勾后刷新网站。
 
 工作流只发布新构建的 `_site`，旧作品页不会进入新部署。仓库中旧的 `projects` 目录及 `content/projects.json` 若仍存在，可另外删除，保持源码整洁。
+
+## 中英对照
+
+个人介绍的中文与英文分别在 `site.json` 中维护。网站界面文字已提供中英对照。将来新增的文章正文按作者实际填写的内容展示，需要双语时请在 Markdown 正文中同时写入中文与英文；构建脚本不调用自动翻译服务。

@@ -15,6 +15,31 @@ import xml.etree.ElementTree as ET
 ROOT = Path(__file__).resolve().parent
 CONFIG = json.loads((ROOT / 'site.json').read_text(encoding='utf-8-sig'))
 ESC = html.escape
+EN = {
+    '主页': 'Home',
+    '博客': 'Blog',
+    '生活': 'Life',
+    '生活记录': 'Life Notes',
+    '博客与生活': 'Blog & Life',
+    '学习笔记': 'Study Notes',
+    '生活随笔': 'Life Journals',
+    '全部': 'All',
+    'QQ 邮箱': 'QQ Email',
+    'B站主页': 'Bilibili',
+    '浏览博客': 'Browse the Blog',
+    '页面未找到': 'Page Not Found',
+    '返回首页': 'Back to Home',
+    '返回文章列表': 'Back to Articles',
+}
+
+
+def bilingual(text: str) -> str:
+    """Keep each interface label and its English translation together."""
+    return ESC(text) + ' · <span lang="en">' + ESC(EN[text]) + '</span>'
+
+
+def notes_intro() -> str:
+    return '<p>学习笔记与生活记录。</p><p class="translation" lang="en">Notes on learning and everyday life.</p>'
 
 
 def local_path(target: str, prefix: str) -> str:
@@ -156,45 +181,48 @@ def page(title: str, body: str, path: str, section: str, description: str | None
 
     nav = []
     for label, target, key in [
-        ('Home', '', 'home'),
-        ('博客 · Blog', 'post/index.html', 'blog'),
-        ('生活 · Life', 'life/index.html', 'life'),
+        (bilingual('主页'), '', 'home'),
+        (bilingual('博客'), 'post/index.html', 'blog'),
+        (bilingual('生活'), 'life/index.html', 'life'),
     ]:
         current = ' aria-current="page"' if key == section else ''
         href = home_href if key == 'home' else prefix + target
         home_attribute = ' data-home-link' if key == 'home' else ''
         nav.append(f'<li><a href="{href}"{current}{home_attribute}><svg class="bookmark" viewBox="0 0 10 14" aria-hidden="true"><path d="M1 1h8v11l-4-3-4 3Z"/></svg><span class="nav-text">{label}</span></a></li>')
     name = ESC(CONFIG['name'])
+    name_en = ESC(CONFIG['name_en'])
     desc = ESC(CONFIG['description'])
+    desc_en = ESC(CONFIG['description_en'])
     canonical = CONFIG['url'].rstrip('/') + '/' + ('' if path == 'index.html' else path.removesuffix('index.html'))
-    document_title = name if section == 'home' else title + ' | ' + name
+    page_title = CONFIG['name'] + ' · ' + CONFIG['name_en'] if section == 'home' else title + (' · ' + EN[title] if title in EN else '') + ' | ' + CONFIG['name'] + ' · ' + CONFIG['name_en']
+    meta_description = (description or CONFIG['description']) + ' ' + CONFIG['description_en']
     return f'''<!doctype html>
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{ESC(document_title)}</title>
-  <meta name="description" content="{ESC(description or CONFIG['description'], quote=True)}">
+  <title>{ESC(page_title)}</title>
+  <meta name="description" content="{ESC(meta_description, quote=True)}">
   <meta name="theme-color" content="#fefefe">
-  <meta property="og:title" content="{ESC(document_title, quote=True)}">
+  <meta property="og:title" content="{ESC(page_title, quote=True)}">
   <meta property="og:type" content="website">
-  <meta property="og:description" content="{ESC(description or CONFIG['description'], quote=True)}">
+  <meta property="og:description" content="{ESC(meta_description, quote=True)}">
   <meta property="og:url" content="{ESC(canonical, quote=True)}">
   <link rel="canonical" href="{ESC(canonical, quote=True)}">
   <link rel="icon" href="{asset_url('assets/favicon.svg')}" type="image/svg+xml">
-  <link rel="alternate" type="application/rss+xml" title="{name}的博客" href="{prefix}feed.xml">
+  <link rel="alternate" type="application/rss+xml" title="{name}的博客 · {name_en}'s Blog" href="{prefix}feed.xml">
   <script src="{asset_url('assets/theme.js')}"></script>
   <link rel="stylesheet" href="{asset_url('assets/style.css')}">
   <script src="{asset_url('assets/main.js')}" defer></script>
 </head>
 <body>
-  <a class="skip-link" href="#main">跳转到正文</a>
+  <a class="skip-link" href="#main">跳转到正文 · <span lang="en">Skip to content</span></a>
   <header class="sidebar">
     <div class="intro">
-      <a class="avatar-link" href="{home_href}" data-home-link aria-label="{name}的首页"><img class="avatar" src="{asset_url(CONFIG['avatar'])}" alt="{name}的照片" width="1706" height="1279"></a>
-      <div><p class="sidebar-description">{name}，{desc}</p><a class="sidebar-github" href="{CONFIG['github']}">GitHub · 2245243969</a><a class="sidebar-email" href="mailto:{ESC(CONFIG['email'], quote=True)}">{ESC(CONFIG['email'])}</a></div>
+      <a class="avatar-link" href="{home_href}" data-home-link aria-label="{name}的首页 · {name_en}'s home"><img class="avatar" src="{asset_url(CONFIG['avatar'])}" alt="{name}的照片 · Photo of {name_en}" width="1706" height="1279"></a>
+      <div><p class="sidebar-description">{name}，{desc}</p><p class="sidebar-description-en" lang="en">{name_en}. {desc_en}</p><a class="sidebar-github" href="{CONFIG['github']}">GitHub · 2245243969</a><a class="sidebar-email" href="mailto:{ESC(CONFIG['email'], quote=True)}" aria-label="QQ 邮箱 · QQ Email: {ESC(CONFIG['email'], quote=True)}">{ESC(CONFIG['email'])}</a><a class="sidebar-bilibili" href="{ESC(CONFIG['bilibili'], quote=True)}" target="_blank" rel="noopener noreferrer">{bilingual('B站主页')}</a></div>
     </div>
-    <nav class="navigation" aria-label="主导航">
+    <nav class="navigation" aria-label="主导航 · Main navigation">
       <button class="menu-button" id="menu-button" aria-expanded="false" aria-controls="navigation-list">菜单 · Menu <span data-menu-state aria-hidden="true">+</span></button>
       <ul id="navigation-list">{''.join(nav)}</ul>
     </nav>
@@ -202,9 +230,9 @@ def page(title: str, body: str, path: str, section: str, description: str | None
   <div class="main-and-footer"><div class="page">
     <main id="main" tabindex="-1">{body}</main>
     <footer class="footer">
-      <label class="theme-label" for="themer">dark theme: <input type="checkbox" id="themer" aria-label="深色主题"><span id="theme-state" aria-hidden="true">off</span></label>
-      <p>{name} · <a href="{CONFIG['github']}">GitHub</a> · <a href="mailto:{ESC(CONFIG['email'], quote=True)}">QQ 邮箱</a> · <a href="{prefix}feed.xml">RSS</a></p>
-      <p class="footer-note">个人主页 · 学习与生活</p>
+      <label class="theme-label" for="themer">深色主题 · <span lang="en">Dark theme:</span> <input type="checkbox" id="themer" aria-label="深色主题 · Dark theme"><span id="theme-state" aria-hidden="true">关 · Off</span></label>
+      <p>{name} <span lang="en">/ {name_en}</span> · <a href="{CONFIG['github']}">GitHub</a> · <a href="mailto:{ESC(CONFIG['email'], quote=True)}">{bilingual('QQ 邮箱')}</a> · <a href="{ESC(CONFIG['bilibili'], quote=True)}" target="_blank" rel="noopener noreferrer">{bilingual('B站主页')}</a> · <a href="{prefix}feed.xml">RSS</a></p>
+      <p class="footer-note">个人主页 · 学习与生活<span class="translation" lang="en">Personal Website · Learning &amp; Life</span></p>
     </footer>
   </div></div>
 </body>
@@ -214,10 +242,10 @@ def page(title: str, body: str, path: str, section: str, description: str | None
 
 def post_list(posts: list[dict], prefix: str) -> str:
     if not posts:
-        return '<div class="empty"><p>还没有发布文章。</p><p>学习笔记与生活记录，陆续更新。</p></div>'
+        return '<div class="empty"><p>还没有发布文章。<span class="translation" lang="en">No articles have been published yet.</span></p><p>学习笔记与生活记录，陆续更新。<span class="translation" lang="en">Study notes and life journals, with more to come.</span></p></div>'
     rows = []
     for post in posts:
-        rows.append(f'''<li><h2 class="post-title"><a href="{prefix}post/{post['slug']}/index.html">{ESC(post['title'])}</a></h2><p class="meta"><time datetime="{post['date']}">{post['date']}</time> · {ESC(post['category'])}</p><p>{ESC(post.get('summary', ''))}</p></li>''')
+        rows.append(f'''<li><h2 class="post-title"><a href="{prefix}post/{post['slug']}/index.html">{ESC(post['title'])}</a></h2><p class="meta"><time datetime="{post['date']}">{post['date']}</time> · {bilingual(post['category'])}</p><p>{ESC(post.get('summary', ''))}</p></li>''')
     return '<ul class="post-list">' + ''.join(rows) + '</ul>'
 
 
@@ -227,13 +255,14 @@ def build(destination: Path) -> None:
         shutil.copytree(ROOT / 'assets', destination / 'assets', dirs_exist_ok=True)
     posts = load_posts()
     pages: dict[str, tuple[str, str, str]] = {}
-    home = f'''<h1>{ESC(CONFIG['name'])}</h1>
-<p class="bio">{ESC(CONFIG['description'])}</p>
+    home = f'''<h1>{ESC(CONFIG['name'])}<span class="name-en" lang="en">{ESC(CONFIG['name_en'])}</span></h1>
+<div class="bio"><p>{ESC(CONFIG['description'])}</p><p class="translation" lang="en">{ESC(CONFIG['description_en'])}</p></div>
 <p>GitHub：<a href="{CONFIG['github']}">github.com/2245243969</a></p>
-<p>QQ 邮箱：<a href="mailto:{ESC(CONFIG['email'], quote=True)}">{ESC(CONFIG['email'])}</a></p>
-<h2>博客与生活：</h2>
-{post_list(posts[:3], '') if posts else '<p class="muted">学习笔记与生活记录，陆续更新。</p>'}
-<p class="section-link"><a href="post/index.html">浏览博客 →</a> &nbsp; <a href="life/index.html">生活记录 →</a></p>'''
+<p>{bilingual('QQ 邮箱')}：<a href="mailto:{ESC(CONFIG['email'], quote=True)}">{ESC(CONFIG['email'])}</a></p>
+<p>{bilingual('B站主页')}：<a href="{ESC(CONFIG['bilibili'], quote=True)}" target="_blank" rel="noopener noreferrer">space.bilibili.com/289847537</a></p>
+<h2>{bilingual('博客与生活')}：</h2>
+{post_list(posts[:3], '') if posts else '<p class="muted">学习笔记与生活记录，陆续更新。<span class="translation" lang="en">Study notes and life journals, with more to come.</span></p>'}
+<p class="section-link"><a href="post/index.html">{bilingual('浏览博客')} →</a> &nbsp; <a href="life/index.html">{bilingual('生活记录')} →</a></p>'''
     pages['index.html'] = (CONFIG['name'], home, 'home')
     blog_filters = [('全部', 'post/index.html'), ('学习笔记', 'post/study/index.html'), ('生活随笔', 'life/index.html')]
     for path, title, selected, category in [
@@ -242,16 +271,16 @@ def build(destination: Path) -> None:
         ('life/index.html', '生活记录', 'life', '生活随笔'),
     ]:
         prefix = '../' * (len(Path(path).parts) - 1)
-        links = ''.join(f'<li><a href="{prefix}{target}"' + (' aria-current="page"' if target == path else '') + f'>{label}</a></li>' for label, target in blog_filters)
+        links = ''.join(f'<li><a href="{prefix}{target}"' + (' aria-current="page"' if target == path else '') + f'>{bilingual(label)}</a></li>' for label, target in blog_filters)
         filtered = [post for post in posts if category is None or post['category'] == category]
-        body = f'<h1>{title}</h1><p>学习笔记与生活记录。</p><ul class="filters" aria-label="文章分类">{links}</ul>' + post_list(filtered, prefix)
+        body = f'<h1>{bilingual(title)}</h1>' + notes_intro() + f'<ul class="filters" aria-label="文章分类 · Article categories">{links}</ul>' + post_list(filtered, prefix)
         pages[path] = (title, body, selected)
     for post in posts:
         section = 'life' if post['category'] == '生活随笔' else 'blog'
         parent = '../../life/index.html' if section == 'life' else '../index.html'
-        body = f'<a class="back-link" href="{parent}">← 返回文章列表</a><article class="article"><h1>{ESC(post["title"])}</h1><p class="meta"><time datetime="{post["date"]}">{post["date"]}</time> · {ESC(post["category"])}</p>' + markdown(post['body'], '../../') + '</article>'
+        body = f'<a class="back-link" href="{parent}">← {bilingual("返回文章列表")}</a><article class="article"><h1>{ESC(post["title"])}</h1><p class="meta"><time datetime="{post["date"]}">{post["date"]}</time> · {bilingual(post["category"])}</p>' + markdown(post['body'], '../../') + '</article>'
         pages[f'post/{post["slug"]}/index.html'] = (post['title'], body, section)
-    pages['404.html'] = ('页面未找到', '<h1>页面未找到</h1><p>这个页面可能已经移动，或链接有误。</p><p><a href="' + CONFIG['url'] + '/">返回首页 →</a></p>', '')
+    pages['404.html'] = ('页面未找到', '<h1>' + bilingual('页面未找到') + '</h1><p>这个页面可能已经移动，或链接有误。</p><p class="translation" lang="en">This page may have moved, or the link may be incorrect.</p><p><a href="' + CONFIG['url'] + '/">' + bilingual('返回首页') + ' →</a></p>', '')
     for path, (title, body, section) in pages.items():
         output = destination / path
         output.parent.mkdir(parents=True, exist_ok=True)
@@ -259,7 +288,7 @@ def build(destination: Path) -> None:
     (destination / '.nojekyll').touch()
     rss = ET.Element('rss', version='2.0')
     channel = ET.SubElement(rss, 'channel')
-    for key, value in [('title', CONFIG['name'] + '的博客'), ('link', CONFIG['url']), ('description', '学习笔记与生活记录'), ('language', 'zh-CN')]:
+    for key, value in [('title', CONFIG['name'] + '的博客 · ' + CONFIG['name_en'] + "'s Blog"), ('link', CONFIG['url']), ('description', '学习笔记与生活记录 · Notes on learning and everyday life'), ('language', 'zh-CN')]:
         ET.SubElement(channel, key).text = value
     for post in posts:
         item = ET.SubElement(channel, 'item')
