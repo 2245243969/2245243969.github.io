@@ -1,3 +1,9 @@
+// Keep double-clicked local previews working while published Home links use /.
+if (location.protocol === 'file:') {
+  for (const link of document.querySelectorAll('[data-home-link]')) {
+    link.href = new URL('index.html', link.href).href;
+  }
+}
 const themeSwitch = document.querySelector('#themer');
 const themeState = document.querySelector('#theme-state');
 function updateTheme(dark) {

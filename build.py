@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import html
+import hashlib
 import json
 from pathlib import Path
 import re
@@ -147,14 +148,22 @@ def page(title: str, body: str, path: str, section: str, description: str | None
     prefix = '../' * depth
     if path == '404.html':
         prefix = CONFIG['url'].rstrip('/') + '/'
+    home_href = prefix or './'
+
+    def asset_url(relative: str) -> str:
+        version = hashlib.sha256((ROOT / relative).read_bytes()).hexdigest()[:12]
+        return ESC(prefix + relative + '?v=' + version, quote=True)
+
     nav = []
     for label, target, key in [
-        ('Home', 'index.html', 'home'),
+        ('Home', '', 'home'),
         ('博客 · Blog', 'post/index.html', 'blog'),
         ('生活 · Life', 'life/index.html', 'life'),
     ]:
         current = ' aria-current="page"' if key == section else ''
-        nav.append(f'<li><a href="{prefix}{target}"{current}><svg class="bookmark" viewBox="0 0 10 14" aria-hidden="true"><path d="M1 1h8v11l-4-3-4 3Z"/></svg><span class="nav-text">{label}</span></a></li>')
+        href = home_href if key == 'home' else prefix + target
+        home_attribute = ' data-home-link' if key == 'home' else ''
+        nav.append(f'<li><a href="{href}"{current}{home_attribute}><svg class="bookmark" viewBox="0 0 10 14" aria-hidden="true"><path d="M1 1h8v11l-4-3-4 3Z"/></svg><span class="nav-text">{label}</span></a></li>')
     name = ESC(CONFIG['name'])
     desc = ESC(CONFIG['description'])
     canonical = CONFIG['url'].rstrip('/') + '/' + ('' if path == 'index.html' else path.removesuffix('index.html'))
@@ -172,17 +181,17 @@ def page(title: str, body: str, path: str, section: str, description: str | None
   <meta property="og:description" content="{ESC(description or CONFIG['description'], quote=True)}">
   <meta property="og:url" content="{ESC(canonical, quote=True)}">
   <link rel="canonical" href="{ESC(canonical, quote=True)}">
-  <link rel="icon" href="{prefix}assets/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="{asset_url('assets/favicon.svg')}" type="image/svg+xml">
   <link rel="alternate" type="application/rss+xml" title="{name}的博客" href="{prefix}feed.xml">
-  <script src="{prefix}assets/theme.js"></script>
-  <link rel="stylesheet" href="{prefix}assets/style.css">
-  <script src="{prefix}assets/main.js" defer></script>
+  <script src="{asset_url('assets/theme.js')}"></script>
+  <link rel="stylesheet" href="{asset_url('assets/style.css')}">
+  <script src="{asset_url('assets/main.js')}" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main">跳转到正文</a>
   <header class="sidebar">
     <div class="intro">
-      <a class="avatar-link" href="{prefix}index.html" aria-label="{name}的首页"><img class="avatar" src="{prefix}{CONFIG['avatar']}" alt="{name}的照片" width="1706" height="1279"></a>
+      <a class="avatar-link" href="{home_href}" data-home-link aria-label="{name}的首页"><img class="avatar" src="{asset_url(CONFIG['avatar'])}" alt="{name}的照片" width="1706" height="1279"></a>
       <div><p class="sidebar-description">{name}，{desc}</p><a class="sidebar-github" href="{CONFIG['github']}">GitHub · 2245243969</a><a class="sidebar-email" href="mailto:{ESC(CONFIG['email'], quote=True)}">{ESC(CONFIG['email'])}</a></div>
     </div>
     <nav class="navigation" aria-label="主导航">
