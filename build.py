@@ -20,16 +20,20 @@ EN = {
     '博客': 'Blog',
     '生活': 'Life',
     '生活记录': 'Life Notes',
-    '博客与生活': 'Blog & Life',
-    '学习笔记': 'Study Notes',
-    '生活随笔': 'Life Journals',
-    '全部': 'All',
+    '论文精读': 'Paper Deep Dives',
+    '概念理解': 'Concept Notes',
+    '碎碎念': 'Random Thoughts',
     'QQ 邮箱': 'QQ Email',
     'B站主页': 'Bilibili',
     '浏览博客': 'Browse the Blog',
     '页面未找到': 'Page Not Found',
     '返回首页': 'Back to Home',
     '返回文章列表': 'Back to Articles',
+}
+BLOG_CATEGORIES = {
+    '论文精读': 'post/study/index.html',
+    '概念理解': 'post/concepts/index.html',
+    '碎碎念': 'post/musings/index.html',
 }
 
 
@@ -39,7 +43,7 @@ def bilingual(text: str) -> str:
 
 
 def notes_intro() -> str:
-    return '<p>学习笔记与生活记录。</p><p class="translation" lang="en">Notes on learning and everyday life.</p>'
+    return '<p>论文精读、概念理解与碎碎念。</p><p class="translation" lang="en">Paper deep dives, concept notes, and random thoughts.</p>'
 
 
 def local_path(target: str, prefix: str) -> str:
@@ -150,7 +154,9 @@ def markdown(source: str, prefix: str, figures: dict | None = None) -> str:
 
 def load_posts() -> list[dict]:
     posts = []
-    for source in sorted((ROOT / 'content/posts').glob('*.md')):
+    sources = [(source, 'blog') for source in (ROOT / 'content/posts').glob('*.md')]
+    sources += [(source, 'life') for source in (ROOT / 'content/life').glob('*.md')]
+    for source, section in sorted(sources, key=lambda item: str(item[0])):
         if source.name.startswith('_'):
             continue
         text = source.read_text(encoding='utf-8-sig')
@@ -164,18 +170,25 @@ def load_posts() -> list[dict]:
                 meta[key.strip()] = value.strip().strip('\"\'')
         if meta.get('draft', 'false').lower() == 'true':
             continue
-        for key in ('title', 'date', 'category'):
+        for key in ('title', 'date') + (('category',) if section == 'blog' else ()):
             if not meta.get(key):
                 raise ValueError(f'{source.name}: missing {key}')
         dt.date.fromisoformat(meta['date'])
-        if meta['category'] not in ('学习笔记', '生活随笔'):
-            raise ValueError(f'{source.name}: category must be 学习笔记 or 生活随笔')
+        if section == 'blog' and meta['category'] not in BLOG_CATEGORIES:
+            raise ValueError(f'{source.name}: category must be 论文精读, 概念理解 or 碎碎念')
+        if section == 'life':
+            meta['category'] = '生活记录'
         if not re.fullmatch(r'[a-zA-Z0-9][a-zA-Z0-9_-]*', source.stem):
             raise ValueError(f'{source.name}: use an English filename, such as my-first-post.md')
         paper_path = source.with_suffix('.json')
         paper = json.loads(paper_path.read_text(encoding='utf-8-sig')) if paper_path.exists() else None
-        posts.append({**meta, 'slug': source.stem, 'body': parts[2].strip(), 'paper': paper})
+        posts.append({**meta, 'section': section, 'slug': source.stem, 'body': parts[2].strip(), 'paper': paper})
     return sorted(posts, key=lambda post: (post['date'], post['slug']), reverse=True)
+
+
+def post_path(post: dict) -> str:
+    directory = 'post' if post['section'] == 'blog' else 'life'
+    return f'{directory}/{post["slug"]}/index.html'
 
 
 def paper_figure(figure: dict, prefix: str) -> str:
@@ -279,11 +292,11 @@ def page(title: str, body: str, path: str, section: str, description: str | None
 
 def post_list(posts: list[dict], prefix: str) -> str:
     if not posts:
-        return '<div class="empty"><p>还没有发布文章。<span class="translation" lang="en">No articles have been published yet.</span></p><p>学习笔记与生活记录，陆续更新。<span class="translation" lang="en">Study notes and life journals, with more to come.</span></p></div>'
+        return '<div class="empty"><p>还没有发布文章。<span class="translation" lang="en">No articles have been published yet.</span></p></div>'
     rows = []
     for post in posts:
         summary_en = '<span class="translation" lang="en">' + ESC(post['summary_en']) + '</span>' if post.get('summary_en') else ''
-        rows.append(f'''<li><h2 class="post-title"><a href="{prefix}post/{post['slug']}/index.html">{ESC(post['title'])}</a></h2><p class="meta"><time datetime="{post['date']}">{post['date']}</time> · {bilingual(post['category'])}</p><p>{ESC(post.get('summary', ''))}{summary_en}</p></li>''')
+        rows.append(f'''<li><h2 class="post-title"><a href="{prefix}{post_path(post)}">{ESC(post['title'])}</a></h2><p class="meta"><time datetime="{post['date']}">{post['date']}</time> · {bilingual(post['category'])}</p><p>{ESC(post.get('summary', ''))}{summary_en}</p></li>''')
     return '<ul class="post-list">' + ''.join(rows) + '</ul>'
 
 
@@ -292,37 +305,42 @@ def build(destination: Path) -> None:
     if (destination / 'assets').resolve() != (ROOT / 'assets').resolve():
         shutil.copytree(ROOT / 'assets', destination / 'assets', dirs_exist_ok=True)
     posts = load_posts()
+    blog_posts = [post for post in posts if post['section'] == 'blog']
+    life_posts = [post for post in posts if post['section'] == 'life']
+    life_empty = '<div class="empty"><p>暂无生活记录。<span class="translation" lang="en">No life updates yet.</span></p></div>'
     pages: dict[str, tuple[str, str, str]] = {}
     home = f'''<h1>{ESC(CONFIG['name'])}<span class="name-en" lang="en">{ESC(CONFIG['name_en'])}</span></h1>
 <div class="bio"><p>{ESC(CONFIG['description'])}</p><p class="translation" lang="en">{ESC(CONFIG['description_en'])}</p></div>
 <p>GitHub：<a href="{CONFIG['github']}">github.com/2245243969</a></p>
 <p>{bilingual('QQ 邮箱')}：<a href="mailto:{ESC(CONFIG['email'], quote=True)}">{ESC(CONFIG['email'])}</a></p>
 <p>{bilingual('B站主页')}：<a href="{ESC(CONFIG['bilibili'], quote=True)}" target="_blank" rel="noopener noreferrer">space.bilibili.com/289847537</a></p>
-<h2>{bilingual('博客与生活')}：</h2>
-{post_list(posts[:3], '') if posts else '<p class="muted">学习笔记与生活记录，陆续更新。<span class="translation" lang="en">Study notes and life journals, with more to come.</span></p>'}
-<p class="section-link"><a href="post/index.html">{bilingual('浏览博客')} →</a> &nbsp; <a href="life/index.html">{bilingual('生活记录')} →</a></p>'''
+<h2>{bilingual('博客')}：</h2>
+{post_list(blog_posts[:3], '')}
+<p class="section-link"><a href="post/index.html">{bilingual('浏览博客')} →</a></p>
+<h2>{bilingual('生活')}：</h2>
+{post_list(life_posts[:3], '') if life_posts else life_empty}'''
     pages['index.html'] = (CONFIG['name'], home, 'home')
-    blog_filters = [('全部', 'post/index.html'), ('学习笔记', 'post/study/index.html'), ('生活随笔', 'life/index.html')]
+    blog_filters = list(BLOG_CATEGORIES.items())
     for path, title, selected, category in [
         ('post/index.html', '博客', 'blog', None),
-        ('post/study/index.html', '学习笔记', 'blog', '学习笔记'),
-        ('life/index.html', '生活记录', 'life', '生活随笔'),
+        *[(target, label, 'blog', label) for label, target in blog_filters],
     ]:
         prefix = '../' * (len(Path(path).parts) - 1)
         links = ''.join(f'<li><a href="{prefix}{target}"' + (' aria-current="page"' if target == path else '') + f'>{bilingual(label)}</a></li>' for label, target in blog_filters)
-        filtered = [post for post in posts if category is None or post['category'] == category]
+        filtered = [post for post in blog_posts if category is None or post['category'] == category]
         body = f'<h1>{bilingual(title)}</h1>' + notes_intro() + f'<ul class="filters" aria-label="文章分类 · Article categories">{links}</ul>' + post_list(filtered, prefix)
         pages[path] = (title, body, selected)
+    pages['life/index.html'] = ('生活', '<h1>' + bilingual('生活') + '</h1>' + (post_list(life_posts, '../') if life_posts else life_empty), 'life')
     for post in posts:
-        section = 'life' if post['category'] == '生活随笔' else 'blog'
-        parent = '../../life/index.html' if section == 'life' else '../index.html'
+        section = post['section']
+        parent = '../index.html' if section == 'life' else '../../' + BLOG_CATEGORIES[post['category']]
         paper = post.get('paper')
         content = markdown(post['body'], '../../', paper.get('figures') if paper else None)
         if paper:
             originals = ''.join(paper_figure(figure, '../../') for figure in paper['handwritten'])
             content = paper_metadata(paper) + '<section class="notes-original" aria-labelledby="notes-title"><h2 id="notes-title">笔记正文 · <span lang="en">Notes</span></h2>' + content + '</section>' + paper_references(paper) + '<section class="handwritten-originals" aria-labelledby="handwritten-title"><h2 id="handwritten-title">手稿原图 · <span lang="en">Original Handwritten Notes</span></h2>' + originals + '</section>'
         body = f'<a class="back-link" href="{parent}">← {bilingual("返回文章列表")}</a><article class="article"><h1>{ESC(post["title"])}</h1><p class="meta"><time datetime="{post["date"]}">{post["date"]}</time> · {bilingual(post["category"])}</p>' + content + '</article>'
-        pages[f'post/{post["slug"]}/index.html'] = (post['title'], body, section)
+        pages[post_path(post)] = (post['title'], body, section)
     pages['404.html'] = ('页面未找到', '<h1>' + bilingual('页面未找到') + '</h1><p>这个页面可能已经移动，或链接有误。</p><p class="translation" lang="en">This page may have moved, or the link may be incorrect.</p><p><a href="' + CONFIG['url'] + '/">' + bilingual('返回首页') + ' →</a></p>', '')
     for path, (title, body, section) in pages.items():
         output = destination / path
@@ -331,9 +349,9 @@ def build(destination: Path) -> None:
     (destination / '.nojekyll').touch()
     rss = ET.Element('rss', version='2.0')
     channel = ET.SubElement(rss, 'channel')
-    for key, value in [('title', CONFIG['name'] + '的博客 · ' + CONFIG['name_en'] + "'s Blog"), ('link', CONFIG['url']), ('description', '学习笔记与生活记录 · Notes on learning and everyday life'), ('language', 'zh-CN')]:
+    for key, value in [('title', CONFIG['name'] + '的博客 · ' + CONFIG['name_en'] + "'s Blog"), ('link', CONFIG['url']), ('description', '论文精读、概念理解与碎碎念 · Paper deep dives, concept notes, and random thoughts'), ('language', 'zh-CN')]:
         ET.SubElement(channel, key).text = value
-    for post in posts:
+    for post in blog_posts:
         item = ET.SubElement(channel, 'item')
         post_url = CONFIG['url'] + '/post/' + quote(post['slug']) + '/'
         for key, value in [('title', post['title']), ('link', post_url), ('guid', post_url), ('description', post.get('summary', ''))]:
