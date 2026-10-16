@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AE，VAE和ELBO | 张育玮 · Yuwei Zhang</title>
+  <meta name="description" content="东北财经大学2023年级大四在读生，人工智能专业。 A fourth-year undergraduate student majoring in Artificial Intelligence at Dongbei University of Finance and Economics (2023 intake).">
+  <meta name="theme-color" content="#fefefe">
+  <meta property="og:title" content="AE，VAE和ELBO | 张育玮 · Yuwei Zhang">
+  <meta property="og:type" content="website">
+  <meta property="og:description" content="东北财经大学2023年级大四在读生，人工智能专业。 A fourth-year undergraduate student majoring in Artificial Intelligence at Dongbei University of Finance and Economics (2023 intake).">
+  <meta property="og:url" content="https://2245243969.github.io/post/ae-vae-elbo/">
+  <link rel="canonical" href="https://2245243969.github.io/post/ae-vae-elbo/">
+  <link rel="icon" href="../../assets/favicon.svg?v=67845ef411f0" type="image/svg+xml">
+  <link rel="alternate" type="application/rss+xml" title="张育玮的博客 · Yuwei Zhang's Blog" href="../../feed.xml">
+  <script src="../../assets/theme.js?v=011042463fd3"></script>
+  <link rel="stylesheet" href="../../assets/style.css?v=bde83ae0c92d">
+  <script src="../../assets/main.js?v=9d21c85f7b1a" defer></script>
+  <link rel="stylesheet" href="../../assets/vendor/katex/katex.min.css?v=0f7e847fbb58">
+  <script src="../../assets/vendor/katex/katex.min.js?v=103a53763cc0" defer></script>
+  <script src="../../assets/math.js?v=aaaaea4807cb" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳转到正文 · <span lang="en">Skip to content</span></a>
+  <header class="sidebar">
+    <div class="intro">
+      <a class="avatar-link" href="../../" data-home-link aria-label="张育玮的首页 · Yuwei Zhang's home"><img class="avatar" src="../../assets/avatar.jpg?v=112182ad06eb" alt="张育玮的照片 · Photo of Yuwei Zhang" width="1706" height="1279"></a>
+      <div><p class="sidebar-description">张育玮，东北财经大学2023年级大四在读生，人工智能专业。</p><p class="sidebar-description-en" lang="en">Yuwei Zhang. A fourth-year undergraduate student majoring in Artificial Intelligence at Dongbei University of Finance and Economics (2023 intake).</p><a class="sidebar-github" href="https://github.com/2245243969">GitHub · 2245243969</a><a class="sidebar-email" href="mailto:2245243969@qq.com" aria-label="QQ 邮箱 · QQ Email: 2245243969@qq.com">2245243969@qq.com</a><a class="sidebar-bilibili" href="https://space.bilibili.com/289847537?spm_id_from=333.1007.0.0" target="_blank" rel="noopener noreferrer">B站主页 · <span lang="en">Bilibili</span></a></div>
+    </div>
+    <nav class="navigation" aria-label="主导航 · Main navigation">
+      <button class="menu-button" id="menu-button" aria-expanded="false" aria-controls="navigation-list">菜单 · Menu <span data-menu-state aria-hidden="true">+</span></button>
+      <ul id="navigation-list"><li><a href="../../" data-home-link><svg class="bookmark" viewBox="0 0 10 14" aria-hidden="true"><path d="M1 1h8v11l-4-3-4 3Z"/></svg><span class="nav-text">主页 · <span lang="en">Home</span></span></a></li><li><a href="../../post/index.html" aria-current="page"><svg class="bookmark" viewBox="0 0 10 14" aria-hidden="true"><path d="M1 1h8v11l-4-3-4 3Z"/></svg><span class="nav-text">博客 · <span lang="en">Blog</span></span></a></li><li><a href="../../life/index.html"><svg class="bookmark" viewBox="0 0 10 14" aria-hidden="true"><path d="M1 1h8v11l-4-3-4 3Z"/></svg><span class="nav-text">生活 · <span lang="en">Life</span></span></a></li></ul>
+    </nav>
+  </header>
+  <div class="main-and-footer"><div class="page">
+    <main id="main" tabindex="-1"><a class="back-link" href="../../post/concepts/index.html">← 返回文章列表 · <span lang="en">Back to Articles</span></a><article class="article"><h1>AE，VAE和ELBO</h1><p class="meta"><time datetime="2026-10-16">2026-10-16</time> · 概念理解 · <span lang="en">Concept Notes</span></p><p>2026/10/16 12:17</p>
+<h2>AE，VAE与ELBO</h2>
+<p>AE包含Encoder和Decoder。现在有一张图片，我们可以观测到的，我们称其为Observed variable <span class="math-inline" data-tex="x">x</span>。有latent variable <span class="math-inline" data-tex="z">z</span>。<span class="math-inline" data-tex="\hat{x}">\hat{x}</span>为重构结果，</p>
+<div class="math-display" data-tex="x \xrightarrow{f_\phi} z \xrightarrow{g_\theta} \hat{x}">x \xrightarrow{f_\phi} z \xrightarrow{g_\theta} \hat{x}</div>
+<p>训练时，我们尽可能让<span class="math-inline" data-tex="\hat{x}">\hat{x}</span>接近<span class="math-inline" data-tex="x">x</span>。对于固定的模型参数，同一个输入<span class="math-inline" data-tex="x">x</span>会有确定的<span class="math-inline" data-tex="z=f_\phi(x)">z=f_\phi(x)</span>。但现在我们想没有新输入，直接生成<span class="math-inline" data-tex="\hat{x}">\hat{x}</span>，这时要先有一个<span class="math-inline" data-tex="z_{\mathrm{new}}">z_{\mathrm{new}}</span>，再给decoder生成，但此时就有问题了，AE的重构目标，无规定如何采样<span class="math-inline" data-tex="z_{\mathrm{new}}">z_{\mathrm{new}}</span>，其主要约束training data encoding后的位置，保证不了在Latent space随意取一点，都能decode成合理图片。</p>
+<figure class="paper-figure" id="ae"><div class="figure-image"><img src="../../assets/notes/ae-vae-elbo/ae.svg?v=bdefdcf0fa8a" alt="图1：AE 的架构。输入经编码器压缩为确定的潜变量，再由解码器重构。 / Figure 1. AE architecture: an encoder produces a deterministic latent code, and a decoder reconstructs the input." width="1000" height="380" loading="lazy"></div><figcaption>图1：AE 的架构。输入经编码器压缩为确定的潜变量，再由解码器重构。<span class="translation" lang="en">Figure 1. AE architecture: an encoder produces a deterministic latent code, and a decoder reconstructs the input.</span></figcaption></figure>
+<p>为了让生成过程能顺利，可假设latent variable来自一个容易sample的分布，比如<span class="math-inline" data-tex="z\sim p(z)=N(0,1)">z\sim p(z)=N(0,1)</span>，之后可用decoder描述给定<span class="math-inline" data-tex="z">z</span>时如何生成数据：<span class="math-inline" data-tex="x\sim p_\theta(x\mid z)">x\sim p_\theta(x\mid z)</span>，此时完整的生成model为：</p>
+<div class="math-display" data-tex="p(z)p_\theta(x\mid z)=p_\theta(x,z)">p(z)p_\theta(x\mid z)=p_\theta(x,z)</div>
+<figure class="paper-figure" id="vae"><div class="figure-image"><img src="../../assets/notes/ae-vae-elbo/vae.svg?v=0c171d235123" alt="图2：VAE 的架构。编码器输出近似后验的参数，采样后交给解码器；生成时可以从先验采样。 / Figure 2. VAE architecture: the encoder parameterizes an approximate posterior; a sampled latent variable is decoded. Generation starts from the prior." width="1000" height="650" loading="lazy"></div><figcaption>图2：VAE 的架构。编码器输出近似后验的参数，采样后交给解码器；生成时可以从先验采样。<span class="translation" lang="en">Figure 2. VAE architecture: the encoder parameterizes an approximate posterior; a sampled latent variable is decoded. Generation starts from the prior.</span></figcaption></figure>
+<p>在这个生成model下，把observed variable <span class="math-inline" data-tex="x">x</span>服从的分布<span class="math-inline" data-tex="p_\theta(x)">p_\theta(x)</span>为：</p>
+<div class="math-display" data-tex="p_\theta(x)=\int p_\theta(x,z)\,dz=\int p(z)p_\theta(x\mid z)\,dz">p_\theta(x)=\int p_\theta(x,z)\,dz=\int p(z)p_\theta(x\mid z)\,dz</div>
+<p>为什么是observed variable <span class="math-inline" data-tex="x">x</span>的分布？不应该是生成的图片的分布吗？VAE想学的不是某一个具体image的重构分布，而是整个data space里的真实image应服从什么分布。</p>
+<p>生成model的方向是<span class="math-inline" data-tex="z\to x">z\to x</span>。但在training时，我们只有image <span class="math-inline" data-tex="x">x</span>，latent variable是不可见的，此时我们就想知道当前model在观察这张图片后，哪些<span class="math-inline" data-tex="z">z</span>更可能解释观测，此时可描述为：</p>
+<div class="math-display" data-tex="p_\theta(z\mid x),\qquad p_\theta(z\mid x)=\frac{p_\theta(x\mid z)p(z)}{p_\theta(x)}">p_\theta(z\mid x),\qquad p_\theta(z\mid x)=\frac{p_\theta(x\mid z)p(z)}{p_\theta(x)}</div>
+<p><span class="math-inline" data-tex="p(z)">p(z)</span>为先验，既未观测<span class="math-inline" data-tex="x">x</span>时我们对<span class="math-inline" data-tex="z">z</span>的假设。</p>
+<p><span class="math-inline" data-tex="p_\theta(z\mid x)">p_\theta(z\mid x)</span>为后验，既观测<span class="math-inline" data-tex="x">x</span>后，在当前model下对<span class="math-inline" data-tex="z">z</span>的推断。VAE不用像AE样让每个<span class="math-inline" data-tex="x">x</span>对应的唯一的latent variable，而是用<span class="math-inline" data-tex="p_\theta(z\mid x)">p_\theta(z\mid x)</span>描述给定<span class="math-inline" data-tex="x">x</span>，不同的<span class="math-inline" data-tex="z">z</span>的概率有多大。</p>
+<p>现在的问题是<span class="math-inline" data-tex="p_\theta(z\mid x)">p_\theta(z\mid x)</span>难以计算，因为<span class="math-inline" data-tex="p_\theta(x)=\int p(z)p_\theta(x\mid z)\,dz">p_\theta(x)=\int p(z)p_\theta(x\mid z)\,dz</span>，称为边缘似然，需要对<span class="math-inline" data-tex="z">z</span>在整个支撑集上做遍历式积分，并按先验<span class="math-inline" data-tex="p(z)">p(z)</span>加权，难以计算。</p>
+<p>此时聪明的前人想到，既然算不了，不如构造一个可计算，可优化的分布<span class="math-inline" data-tex="q_\phi(z\mid x)">q_\phi(z\mid x)</span>，让其一点点逼近真实的<span class="math-inline" data-tex="p_\theta(z\mid x)">p_\theta(z\mid x)</span>。</p>
+<figure class="paper-figure" id="variational"><div class="figure-image"><img src="../../assets/notes/ae-vae-elbo/variational.svg?v=6ff5c9810692" alt="图3：变分推断示意图，按手稿重绘。在分布族 Q 内寻找接近真实后验的分布；图中位置仅作示意。 / Figure 3. Variational inference, redrawn from the manuscript. Search within a family Q for an approximation to the true posterior. Positions are schematic." width="1000" height="550" loading="lazy"></div><figcaption>图3：变分推断示意图，按手稿重绘。在分布族 Q 内寻找接近真实后验的分布；图中位置仅作示意。<span class="translation" lang="en">Figure 3. Variational inference, redrawn from the manuscript. Search within a family Q for an approximation to the true posterior. Positions are schematic.</span></figcaption></figure>
+<p>在一个分布族中寻找合适的分布，让其近似于真实的后验，这就是变分推断的基本思路。为了衡量做近似误差，很自然地想到用KL散度来衡量。对于假设的生成模型参数<span class="math-inline" data-tex="\theta">\theta</span>，我们希望</p>
+<div class="math-display" data-tex="\min_\phi D_{\mathrm{KL}}\!\left(q_\phi(z\mid x)\,\|\,p_\theta(z\mid x)\right)">\min_\phi D_{\mathrm{KL}}\!\left(q_\phi(z\mid x)\,\|\,p_\theta(z\mid x)\right)</div>
+<h2>ELBO</h2>
+<p>但该式子还是有<span class="math-inline" data-tex="p_\theta(z\mid x)">p_\theta(z\mid x)</span>，还需要改写成可计算形式：</p>
+<div class="math-display" data-tex="D_{\mathrm{KL}}\!\left(q_\phi(z\mid x)\,\|\,p_\theta(z\mid x)\right)
+=\mathbb{E}_{q_\phi(z\mid x)}\!\left[\log\frac{q_\phi(z\mid x)}{p_\theta(z\mid x)}\right]">D_{\mathrm{KL}}\!\left(q_\phi(z\mid x)\,\|\,p_\theta(z\mid x)\right)
+=\mathbb{E}_{q_\phi(z\mid x)}\!\left[\log\frac{q_\phi(z\mid x)}{p_\theta(z\mid x)}\right]</div>
+<p>而</p>
+<div class="math-display" data-tex="p_\theta(z\mid x)=\frac{p_\theta(x,z)}{p_\theta(x)}">p_\theta(z\mid x)=\frac{p_\theta(x,z)}{p_\theta(x)}</div>
+<div class="math-display" data-tex="\begin{aligned}
+D_{\mathrm{KL}}\!\left(q_\phi(\cdot)\,\|\,p_\theta(\cdot)\right)
+&amp;=\mathbb{E}_{q_\phi(z\mid x)}\!\left[\log q_\phi(z\mid x)\right.\\
+&amp;\qquad\left.-\log p_\theta(x,z)+\log p_\theta(x)\right]
+\end{aligned}">\begin{aligned}
+D_{\mathrm{KL}}\!\left(q_\phi(\cdot)\,\|\,p_\theta(\cdot)\right)
+&amp;=\mathbb{E}_{q_\phi(z\mid x)}\!\left[\log q_\phi(z\mid x)\right.\\
+&amp;\qquad\left.-\log p_\theta(x,z)+\log p_\theta(x)\right]
+\end{aligned}</div>
+<p>而<span class="math-inline" data-tex="\log p_\theta(x)">\log p_\theta(x)</span>不依赖于随机变量<span class="math-inline" data-tex="z">z</span>，可直接移到期望之外，</p>
+<p>则</p>
+<div class="math-display" data-tex="\begin{aligned}
+D_{\mathrm{KL}}\!\left(q_\phi(\cdot)\,\|\,p_\theta(\cdot)\right)
+&amp;=\log p_\theta(x)\\
+&amp;\quad-\mathbb{E}_{q_\phi(z\mid x)}\!\left[\log p_\theta(x,z)-\log q_\phi(z\mid x)\right]
+\end{aligned}">\begin{aligned}
+D_{\mathrm{KL}}\!\left(q_\phi(\cdot)\,\|\,p_\theta(\cdot)\right)
+&amp;=\log p_\theta(x)\\
+&amp;\quad-\mathbb{E}_{q_\phi(z\mid x)}\!\left[\log p_\theta(x,z)-\log q_\phi(z\mid x)\right]
+\end{aligned}</div>
+<p>我们将<span class="math-inline" data-tex="\mathbb{E}_{q_\phi(z\mid x)}[\log p_\theta(x,z)-\log q_\phi(z\mid x)]">\mathbb{E}_{q_\phi(z\mid x)}[\log p_\theta(x,z)-\log q_\phi(z\mid x)]</span>定义为ELBO（Evidence Lower Bound，证据下界）<span class="math-inline" data-tex="L_{\mathrm{ELBO}}(\theta,\phi;x)">L_{\mathrm{ELBO}}(\theta,\phi;x)</span></p>
+<div class="math-display" data-tex="D_{\mathrm{KL}}\!\left(q_\phi(z\mid x)\,\|\,p_\theta(z\mid x)\right)=-\mathrm{ELBO}+\log p_\theta(x)">D_{\mathrm{KL}}\!\left(q_\phi(z\mid x)\,\|\,p_\theta(z\mid x)\right)=-\mathrm{ELBO}+\log p_\theta(x)</div>
+<div class="math-display" data-tex="\Rightarrow\quad\underbrace{\log p_\theta(x)}_{\text{定值}}=\underbrace{D_{\mathrm{KL}}}_{\text{原任务最小化}}+\mathrm{ELBO}">\Rightarrow\quad\underbrace{\log p_\theta(x)}_{\text{定值}}=\underbrace{D_{\mathrm{KL}}}_{\text{原任务最小化}}+\mathrm{ELBO}</div>
+<p>由于<span class="math-inline" data-tex="D_{\mathrm{KL}}">D_{\mathrm{KL}}</span>有后验难以计算，但<span class="math-inline" data-tex="D_{\mathrm{KL}}+\mathrm{ELBO}">D_{\mathrm{KL}}+\mathrm{ELBO}</span>为一个定值，则可将原先最小化<span class="math-inline" data-tex="D_{\mathrm{KL}}">D_{\mathrm{KL}}</span>的问题转为最大化ELBO。</p>
+<p>这就是ELBO的讲述，但ELBO到VAE最终损失函数仍有距离，下次再学了……</p><section class="paper-references"><h2>参考视频 · <span lang="en">Reference Videos</span></h2><ol><li><a href="https://www.bilibili.com/video/BV1wx421k74m/?spm_id_from=333.1391.0.0&amp;vd_source=0871f8eff5ef6ea15084ceb805af5c12" target="_blank" rel="noopener noreferrer">参考视频 1 · Reference Video 1 — BV1wx421k74m</a></li><li><a href="https://www.bilibili.com/video/BV1Gs4y157BU/?spm_id_from=333.788.top_right_bar_window_history.content.click" target="_blank" rel="noopener noreferrer">参考视频 2 · Reference Video 2 — BV1Gs4y157BU</a></li></ol></section><section class="handwritten-originals" aria-labelledby="handwritten-title"><h2 id="handwritten-title">手稿原图 · <span lang="en">Original Handwritten Notes</span></h2><figure class="paper-figure" id="manuscript-0"><div class="figure-image"><img src="../../assets/notes/ae-vae-elbo/manuscript-0.jpg?v=7527989b1c2b" alt="原稿1：废稿，仅保留原图，不转录正文。 / Manuscript 1. Discarded draft; included as an image only." width="3024" height="4032" loading="lazy"></div><figcaption>原稿1：废稿，仅保留原图，不转录正文。<span class="translation" lang="en">Manuscript 1. Discarded draft; included as an image only.</span></figcaption></figure><figure class="paper-figure" id="manuscript-1"><div class="figure-image quarter-turn" style="aspect-ratio:4032/3024;--scan-width:75.000000%"><img src="../../assets/notes/ae-vae-elbo/manuscript-1.jpg?v=4fd1182fcd2b" alt="原稿2：笔记第1页。 / Manuscript 2. Notes, page 1." width="3024" height="4032" loading="lazy"></div><figcaption>原稿2：笔记第1页。<span class="translation" lang="en">Manuscript 2. Notes, page 1.</span></figcaption></figure><figure class="paper-figure" id="manuscript-2"><div class="figure-image quarter-turn" style="aspect-ratio:3024/4032;--scan-width:133.333333%"><img src="../../assets/notes/ae-vae-elbo/manuscript-2.jpg?v=28237f7b3876" alt="原稿3：笔记第2页。 / Manuscript 3. Notes, page 2." width="4032" height="3024" loading="lazy"></div><figcaption>原稿3：笔记第2页。<span class="translation" lang="en">Manuscript 3. Notes, page 2.</span></figcaption></figure><figure class="paper-figure" id="manuscript-3"><div class="figure-image quarter-turn" style="aspect-ratio:3024/4032;--scan-width:133.333333%"><img src="../../assets/notes/ae-vae-elbo/manuscript-3.jpg?v=c27d5c04ef46" alt="原稿4：笔记第3页。 / Manuscript 4. Notes, page 3." width="4032" height="3024" loading="lazy"></div><figcaption>原稿4：笔记第3页。<span class="translation" lang="en">Manuscript 4. Notes, page 3.</span></figcaption></figure></section></article></main>
+    <footer class="footer">
+      <label class="theme-label" for="themer">深色主题 · <span lang="en">Dark theme:</span> <input type="checkbox" id="themer" aria-label="深色主题 · Dark theme"><span id="theme-state" aria-hidden="true">关 · Off</span></label>
+      <p>张育玮 <span lang="en">/ Yuwei Zhang</span> · <a href="https://github.com/2245243969">GitHub</a> · <a href="mailto:2245243969@qq.com">QQ 邮箱 · <span lang="en">QQ Email</span></a> · <a href="https://space.bilibili.com/289847537?spm_id_from=333.1007.0.0" target="_blank" rel="noopener noreferrer">B站主页 · <span lang="en">Bilibili</span></a> · <a href="../../feed.xml">RSS</a></p>
+      <p class="footer-note">个人主页 · 学习与生活<span class="translation" lang="en">Personal Website · Learning &amp; Life</span></p>
+    </footer>
+  </div></div>
+</body>
+</html>

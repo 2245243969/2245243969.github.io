@@ -1,0 +1,76 @@
+{
+  "kind": "concept",
+  "figures": {
+    "ae": {
+      "id": "ae",
+      "image": "assets/notes/ae-vae-elbo/ae.svg",
+      "caption": "图1：AE 的架构。输入经编码器压缩为确定的潜变量，再由解码器重构。",
+      "caption_en": "Figure 1. AE architecture: an encoder produces a deterministic latent code, and a decoder reconstructs the input.",
+      "width": 1000,
+      "height": 380
+    },
+    "vae": {
+      "id": "vae",
+      "image": "assets/notes/ae-vae-elbo/vae.svg",
+      "caption": "图2：VAE 的架构。编码器输出近似后验的参数，采样后交给解码器；生成时可以从先验采样。",
+      "caption_en": "Figure 2. VAE architecture: the encoder parameterizes an approximate posterior; a sampled latent variable is decoded. Generation starts from the prior.",
+      "width": 1000,
+      "height": 650
+    },
+    "variational": {
+      "id": "variational",
+      "image": "assets/notes/ae-vae-elbo/variational.svg",
+      "caption": "图3：变分推断示意图，按手稿重绘。在分布族 Q 内寻找接近真实后验的分布；图中位置仅作示意。",
+      "caption_en": "Figure 3. Variational inference, redrawn from the manuscript. Search within a family Q for an approximation to the true posterior. Positions are schematic.",
+      "width": 1000,
+      "height": 550
+    }
+  },
+  "handwritten": [
+    {
+      "id": "manuscript-0",
+      "image": "assets/notes/ae-vae-elbo/manuscript-0.jpg",
+      "caption": "原稿1：废稿，仅保留原图，不转录正文。",
+      "caption_en": "Manuscript 1. Discarded draft; included as an image only.",
+      "width": 3024,
+      "height": 4032
+    },
+    {
+      "id": "manuscript-1",
+      "image": "assets/notes/ae-vae-elbo/manuscript-1.jpg",
+      "caption": "原稿2：笔记第1页。",
+      "caption_en": "Manuscript 2. Notes, page 1.",
+      "width": 3024,
+      "height": 4032,
+      "rotate": -90
+    },
+    {
+      "id": "manuscript-2",
+      "image": "assets/notes/ae-vae-elbo/manuscript-2.jpg",
+      "caption": "原稿3：笔记第2页。",
+      "caption_en": "Manuscript 3. Notes, page 2.",
+      "width": 4032,
+      "height": 3024,
+      "rotate": -90
+    },
+    {
+      "id": "manuscript-3",
+      "image": "assets/notes/ae-vae-elbo/manuscript-3.jpg",
+      "caption": "原稿4：笔记第3页。",
+      "caption_en": "Manuscript 4. Notes, page 3.",
+      "width": 4032,
+      "height": 3024,
+      "rotate": -90
+    }
+  ],
+  "reference_videos": [
+    {
+      "label": "参考视频 1 · Reference Video 1 — BV1wx421k74m",
+      "url": "https://www.bilibili.com/video/BV1wx421k74m/?spm_id_from=333.1391.0.0&vd_source=0871f8eff5ef6ea15084ceb805af5c12"
+    },
+    {
+      "label": "参考视频 2 · Reference Video 2 — BV1Gs4y157BU",
+      "url": "https://www.bilibili.com/video/BV1Gs4y157BU/?spm_id_from=333.788.top_right_bar_window_history.content.click"
+    }
+  ]
+}

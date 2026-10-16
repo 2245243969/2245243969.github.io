@@ -61,6 +61,7 @@ def inline(value: str, prefix: str = '') -> str:
         return f'\x00{len(tokens) - 1}\x00'
 
     value = re.sub(r'`([^`]+)`', lambda m: token('<code>' + ESC(m[1]) + '</code>'), value)
+    value = re.sub(r'\$([^$\n]+)\$', lambda m: token('<span class="math-inline" data-tex="' + ESC(m[1], quote=True) + '">' + ESC(m[1]) + '</span>'), value)
 
     def link(match: re.Match) -> str:
         image, label, target = match.groups()
@@ -86,6 +87,7 @@ def markdown(source: str, prefix: str, figures: dict | None = None) -> str:
     paragraph: list[str] = []
     list_type: str | None = None
     code: list[str] | None = None
+    math: list[str] | None = None
 
     def flush() -> None:
         if paragraph:
@@ -99,6 +101,19 @@ def markdown(source: str, prefix: str, figures: dict | None = None) -> str:
             list_type = None
 
     for line in source.splitlines():
+        if code is None and line.strip() == '$$':
+            flush()
+            end_list()
+            if math is None:
+                math = []
+            else:
+                tex = '\n'.join(math)
+                result.append('<div class="math-display" data-tex="' + ESC(tex, quote=True) + '">' + ESC(tex) + '</div>')
+                math = None
+            continue
+        if math is not None:
+            math.append(line)
+            continue
         if line.startswith('```'):
             flush()
             end_list()
@@ -149,6 +164,8 @@ def markdown(source: str, prefix: str, figures: dict | None = None) -> str:
     end_list()
     if code is not None:
         result.append('<pre><code>' + ESC('\n'.join(code)) + '</code></pre>')
+    if math is not None:
+        raise ValueError('Unclosed display math block')
     return '\n'.join(result)
 
 
@@ -200,7 +217,11 @@ def paper_figure(figure: dict, prefix: str) -> str:
     source = ''
     if figure.get('source'):
         source = '<span class="figure-source"><a href="' + ESC(figure['source'], quote=True) + '">Zhang et al. (2024)</a> · ' + ESC(figure['locator']) + ' · <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></span>'
-    return f'''<figure class="paper-figure" id="{ESC(figure['id'], quote=True)}"><div class="figure-image"><img src="{src}" alt="{caption} / {caption_en}" width="{figure['width']}" height="{figure['height']}" loading="lazy"></div><figcaption>{caption}<span class="translation" lang="en">{caption_en}</span>{source}</figcaption></figure>'''
+    wrapper = 'class="figure-image"'
+    if figure.get('rotate') == -90:
+        width, height = int(figure['width']), int(figure['height'])
+        wrapper = f'class="figure-image quarter-turn" style="aspect-ratio:{height}/{width};--scan-width:{100 * width / height:.6f}%"'
+    return f'''<figure class="paper-figure" id="{ESC(figure['id'], quote=True)}"><div {wrapper}><img src="{src}" alt="{caption} / {caption_en}" width="{figure['width']}" height="{figure['height']}" loading="lazy"></div><figcaption>{caption}<span class="translation" lang="en">{caption_en}</span>{source}</figcaption></figure>'''
 
 
 def paper_metadata(paper: dict) -> str:
@@ -246,6 +267,11 @@ def page(title: str, body: str, path: str, section: str, description: str | None
     canonical = CONFIG['url'].rstrip('/') + '/' + ('' if path == 'index.html' else path.removesuffix('index.html'))
     page_title = CONFIG['name'] + ' · ' + CONFIG['name_en'] if section == 'home' else title + (' · ' + EN[title] if title in EN else '') + ' | ' + CONFIG['name'] + ' · ' + CONFIG['name_en']
     meta_description = (description or CONFIG['description']) + ' ' + CONFIG['description_en']
+    math_assets = ''
+    if 'data-tex=' in body:
+        math_assets = f'''<link rel="stylesheet" href="{asset_url('assets/vendor/katex/katex.min.css')}">
+  <script src="{asset_url('assets/vendor/katex/katex.min.js')}" defer></script>
+  <script src="{asset_url('assets/math.js')}" defer></script>'''
     return f'''<!doctype html>
 <html lang="zh-CN">
 <head>
@@ -264,6 +290,7 @@ def page(title: str, body: str, path: str, section: str, description: str | None
   <script src="{asset_url('assets/theme.js')}"></script>
   <link rel="stylesheet" href="{asset_url('assets/style.css')}">
   <script src="{asset_url('assets/main.js')}" defer></script>
+  {math_assets}
 </head>
 <body>
   <a class="skip-link" href="#main">跳转到正文 · <span lang="en">Skip to content</span></a>
@@ -336,9 +363,16 @@ def build(destination: Path) -> None:
         parent = '../index.html' if section == 'life' else '../../' + BLOG_CATEGORIES[post['category']]
         paper = post.get('paper')
         content = markdown(post['body'], '../../', paper.get('figures') if paper else None)
-        if paper:
+        if paper and paper.get('kind') != 'concept':
             originals = ''.join(paper_figure(figure, '../../') for figure in paper['handwritten'])
             content = paper_metadata(paper) + '<section class="notes-original" aria-labelledby="notes-title"><h2 id="notes-title">笔记正文 · <span lang="en">Notes</span></h2>' + content + '</section>' + paper_references(paper) + '<section class="handwritten-originals" aria-labelledby="handwritten-title"><h2 id="handwritten-title">手稿原图 · <span lang="en">Original Handwritten Notes</span></h2>' + originals + '</section>'
+        elif paper:
+            videos = ''.join('<li><a href="' + ESC(video['url'], quote=True) + '" target="_blank" rel="noopener noreferrer">' + ESC(video['label']) + '</a></li>' for video in paper.get('reference_videos', []))
+            if videos:
+                content += '<section class="paper-references"><h2>参考视频 · <span lang="en">Reference Videos</span></h2><ol>' + videos + '</ol></section>'
+            originals = ''.join(paper_figure(figure, '../../') for figure in paper.get('handwritten', []))
+            if originals:
+                content += '<section class="handwritten-originals" aria-labelledby="handwritten-title"><h2 id="handwritten-title">手稿原图 · <span lang="en">Original Handwritten Notes</span></h2>' + originals + '</section>'
         body = f'<a class="back-link" href="{parent}">← {bilingual("返回文章列表")}</a><article class="article"><h1>{ESC(post["title"])}</h1><p class="meta"><time datetime="{post["date"]}">{post["date"]}</time> · {bilingual(post["category"])}</p>' + content + '</article>'
         pages[post_path(post)] = (post['title'], body, section)
     pages['404.html'] = ('页面未找到', '<h1>' + bilingual('页面未找到') + '</h1><p>这个页面可能已经移动，或链接有误。</p><p class="translation" lang="en">This page may have moved, or the link may be incorrect.</p><p><a href="' + CONFIG['url'] + '/">' + bilingual('返回首页') + ' →</a></p>', '')
