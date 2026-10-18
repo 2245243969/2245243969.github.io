@@ -216,7 +216,8 @@ def paper_figure(figure: dict, prefix: str) -> str:
     caption_en = ESC(figure['caption_en'])
     source = ''
     if figure.get('source'):
-        source = '<span class="figure-source"><a href="' + ESC(figure['source'], quote=True) + '">Zhang et al. (2024)</a> · ' + ESC(figure['locator']) + ' · <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></span>'
+        source_label = ESC(figure.get('source_label', 'Zhang et al. (2024)'))
+        source = '<span class="figure-source"><a href="' + ESC(figure['source'], quote=True) + '">' + source_label + '</a> · ' + ESC(figure['locator']) + ' · <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></span>'
     wrapper = 'class="figure-image"'
     if figure.get('rotate') == -90:
         width, height = int(figure['width']), int(figure['height'])
@@ -229,7 +230,9 @@ def paper_metadata(paper: dict) -> str:
     emails = ''.join('<li>' + ESC(author['name']) + '：<a href="mailto:' + ESC(author['email'], quote=True) + '">' + ESC(author['email']) + '</a></li>' for author in paper['authors'])
     links = ' · '.join('<a href="' + ESC(link['url'], quote=True) + '">' + ESC(link['label']) + '</a>' for link in paper['links'])
     keywords = ''.join('<li>' + ESC(item['zh']) + ('<span lang="en"> / ' + ESC(item['en']) + '</span>' if item['zh'] != item['en'] else '') + '</li>' for item in paper['keywords'])
-    return f'''<section class="paper-details" aria-label="论文信息 · Paper information"><dl class="paper-metadata"><dt>作者 · <span lang="en">Authors</span></dt><dd>{names}<br>北京大学 · <span lang="en">Peking University</span><br><span class="meta">通讯作者 · <span lang="en">Corresponding author</span>：Yansong Feng</span></dd><dt>作者邮箱 · <span lang="en">Author emails</span></dt><dd><ul class="author-emails">{emails}</ul></dd><dt>发表信息 · <span lang="en">Publication</span></dt><dd><span lang="en">{ESC(paper['venue'])}</span><br>{ESC(paper['publication_details'])}</dd><dt>链接 · <span lang="en">Links</span></dt><dd>{links}</dd><dt>关键词 · <span lang="en">Keywords</span></dt><dd><ul class="paper-keywords">{keywords}</ul></dd></dl></section>'''
+    affiliations = '<br>'.join(ESC(item['zh']) + ' · <span lang="en">' + ESC(item['en']) + '</span>' for item in paper.get('affiliations', [{'zh': '北京大学', 'en': 'Peking University'}]))
+    corresponding = ESC(paper.get('corresponding_author', 'Yansong Feng'))
+    return f'''<section class="paper-details" aria-label="论文信息 · Paper information"><dl class="paper-metadata"><dt>作者 · <span lang="en">Authors</span></dt><dd>{names}<br>{affiliations}<br><span class="meta">通讯作者 · <span lang="en">Corresponding author</span>：{corresponding}</span></dd><dt>作者邮箱 · <span lang="en">Author emails</span></dt><dd><ul class="author-emails">{emails}</ul></dd><dt>发表信息 · <span lang="en">Publication</span></dt><dd><span lang="en">{ESC(paper['venue'])}</span><br>{ESC(paper['publication_details'])}</dd><dt>链接 · <span lang="en">Links</span></dt><dd>{links}</dd><dt>关键词 · <span lang="en">Keywords</span></dt><dd><ul class="paper-keywords">{keywords}</ul></dd></dl></section>'''
 
 
 def paper_references(paper: dict) -> str:

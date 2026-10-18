@@ -1,0 +1,64 @@
+{
+  "authors": [
+    {"name": "Rongqing Jiang", "email": "jiangrongqing@stu.hit.edu.cn"},
+    {"name": "Xuebo Liu", "email": "liuxuebo@hit.edu.cn"},
+    {"name": "Shengxin Liu", "email": "sxliu@hit.edu.cn"},
+    {"name": "Yutong Wang", "email": "wangyutong@stu.hit.edu.cn"},
+    {"name": "Min Zhang（华为）", "email": "zhangmin186@huawei.com"},
+    {"name": "Shimin Tao", "email": "taoshimin@huawei.com"},
+    {"name": "Daimeng Wei", "email": "weidaimeng@huawei.com"},
+    {"name": "Min Zhang（哈工大）", "email": "zhangmin2021@hit.edu.cn"}
+  ],
+  "affiliations": [
+    {"zh": "哈尔滨工业大学（深圳）计算与智能研究院", "en": "Institute of Computing and Intelligence, Harbin Institute of Technology, Shenzhen"},
+    {"zh": "哈尔滨工业大学（深圳）计算机科学与技术学院", "en": "School of Computer Science and Technology, Harbin Institute of Technology, Shenzhen"},
+    {"zh": "华为翻译服务中心", "en": "Huawei Translation Services Center"}
+  ],
+  "corresponding_author": "Xuebo Liu",
+  "venue": "Proceedings of the 64th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)",
+  "publication_details": "2026 年 7 月 2–7 日 / July 2–7, 2026 · pp. 6603–6621 · Association for Computational Linguistics",
+  "links": [
+    {"label": "论文主页 / ACL Anthology", "url": "https://aclanthology.org/2026.acl-long.299/"},
+    {"label": "PDF", "url": "https://aclanthology.org/2026.acl-long.299.pdf"},
+    {"label": "DOI: 10.18653/v1/2026.acl-long.299", "url": "https://doi.org/10.18653/v1/2026.acl-long.299"},
+    {"label": "代码 / Code", "url": "https://github.com/jrongqing/DeReA"}
+  ],
+  "keywords": [
+    {"zh": "习语翻译", "en": "Idiom Translation"},
+    {"zh": "大语言模型", "en": "Large Language Models"},
+    {"zh": "语义冲突检测", "en": "Semantic Conflict Detection"},
+    {"zh": "偏好对齐", "en": "Preference Alignment"},
+    {"zh": "直接偏好优化", "en": "DPO"},
+    {"zh": "检索增强生成", "en": "RAG"},
+    {"zh": "双路径仲裁", "en": "Dual-Path Arbitration"},
+    {"zh": "DEREA", "en": "DEREA"}
+  ],
+  "figures": {
+    "figure1": {
+      "id": "figure-1",
+      "image": "assets/images/derea/figure-1.png",
+      "width": 1400,
+      "height": 1100,
+      "caption": "Figure 1：DEREA 框架总览。上半部分为偏好对齐的习语检测，下半部分为规范化习语检索与双路径翻译仲裁。",
+      "caption_en": "Figure 1: An overview of DEREA, with preference-aligned idiom detection, normalized idiom retrieval, and arbitrated dual-path translation.",
+      "source": "https://aclanthology.org/2026.acl-long.299/",
+      "source_label": "Jiang et al. (2026)",
+      "locator": "Figure 1 · PDF p. 4 / 论文第 6606 页 · 从原 PDF 裁取，内容未改动"
+    }
+  },
+  "references": [
+    {
+      "id": "jiang-2026-derea",
+      "authors": "Rongqing Jiang, Xuebo Liu, Shengxin Liu, Yutong Wang, Min Zhang, Shimin Tao, Daimeng Wei, and Min Zhang",
+      "year": "2026",
+      "title": "DeReA: Improving Idiom Translation with Detect-Retrieve-Arbitrate Reasoning",
+      "publication": "Proceedings of the 64th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pp. 6603–6621. 本文对照范围：§3.1–3.2、Figure 1、式 (1)–(9)、附录 A.1–A.2 及 A.4",
+      "url": "https://aclanthology.org/2026.acl-long.299/"
+    }
+  ],
+  "handwritten": [
+    {"id": "handwritten-1", "image": "assets/images/derea/handwritten-1.jpg", "width": 3024, "height": 4032, "caption": "手稿原图，第 1 页：研究动机、方法总览与 SFT 数据构造。", "caption_en": "Original handwritten notes, page 1: motivation, methodology, and SFT data construction."},
+    {"id": "handwritten-2", "image": "assets/images/derea/handwritten-2.jpg", "width": 3024, "height": 4032, "caption": "手稿原图，第 2 页：SFT 与 DPO 目标、习语检索及双路径翻译。", "caption_en": "Original handwritten notes, page 2: SFT and DPO objectives, retrieval, and dual-path translation."},
+    {"id": "handwritten-3", "image": "assets/images/derea/handwritten-3.jpg", "width": 3024, "height": 4032, "caption": "手稿原图，第 3 页：候选译文比较与最终仲裁。", "caption_en": "Original handwritten notes, page 3: candidate comparison and final arbitration."}
+  ]
+}
