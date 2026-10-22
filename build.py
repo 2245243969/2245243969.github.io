@@ -228,7 +228,7 @@ def paper_figure(figure: dict, prefix: str) -> str:
 
 def paper_metadata(paper: dict) -> str:
     names = ' · '.join(ESC(author['name']) for author in paper['authors'])
-    emails = ''.join('<li>' + ESC(author['name']) + '：<a href="mailto:' + ESC(author['email'], quote=True) + '">' + ESC(author['email']) + '</a></li>' for author in paper['authors'])
+    emails = ''.join('<li>' + ESC(author['name']) + '：<a href="mailto:' + ESC(author['email'], quote=True) + '">' + ESC(author['email']) + '</a></li>' for author in paper['authors'] if author.get('email'))
     links = ' · '.join('<a href="' + ESC(link['url'], quote=True) + '">' + ESC(link['label']) + '</a>' for link in paper['links'])
     keywords = ''.join('<li>' + ESC(item['zh']) + ('<span lang="en"> / ' + ESC(item['en']) + '</span>' if item['zh'] != item['en'] else '') + '</li>' for item in paper['keywords'])
     affiliations = '<br>'.join(ESC(item['zh']) + ' · <span lang="en">' + ESC(item['en']) + '</span>' for item in paper.get('affiliations', [{'zh': '北京大学', 'en': 'Peking University'}]))

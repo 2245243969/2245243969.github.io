@@ -1,0 +1,71 @@
+{
+  "authors": [
+    {"name": "Dianqing Lin", "email": "lindian7ing@163.com"},
+    {"name": "Aruukhan", "email": "csaruukhan@mail.imu.edu.cn"},
+    {"name": "Hongxu Hou", "email": "cshhx@imu.edu.cn"},
+    {"name": "Shuo Sun"},
+    {"name": "Wei Chen"},
+    {"name": "Yichen Yang"},
+    {"name": "Guodong Shi"}
+  ],
+  "affiliations": [
+    {"zh": "内蒙古大学", "en": "College of Computer Science, Inner Mongolia University"},
+    {"zh": "内蒙古工业大学", "en": "College of Intelligent Science and Technology, Inner Mongolia University of Technology"}
+  ],
+  "corresponding_author": "Hongxu Hou",
+  "venue": "Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing",
+  "publication_details": "2025 年 11 月 / November 2025 · pp. 23137–23150 · Association for Computational Linguistics",
+  "links": [
+    {"label": "论文主页 / ACL Anthology", "url": "https://aclanthology.org/2025.emnlp-main.1179/"},
+    {"label": "PDF", "url": "https://aclanthology.org/2025.emnlp-main.1179.pdf"},
+    {"label": "DOI: 10.18653/v1/2025.emnlp-main.1179", "url": "https://doi.org/10.18653/v1/2025.emnlp-main.1179"},
+    {"label": "代码与数据 / Code & Data", "url": "https://github.com/csdq777/Lotus"}
+  ],
+  "keywords": [
+    {"zh": "低资源机器翻译", "en": "Low-Resource Machine Translation"},
+    {"zh": "代表性不足的书写系统", "en": "Underrepresented Scripts"},
+    {"zh": "上下文学习", "en": "In-Context Learning"},
+    {"zh": "词典检索", "en": "Dictionary Retrieval"},
+    {"zh": "传统蒙古文", "en": "Traditional Mongolian Script"},
+    {"zh": "彝文", "en": "Yi Script"},
+    {"zh": "Lotus", "en": "Lotus"}
+  ],
+  "references": [
+    {
+      "id": "zhang-2024-dipmt",
+      "authors": "Chen Zhang, Xiao Liu, Jiuheng Lin, and Yansong Feng",
+      "year": "2024",
+      "title": "Teaching Large Language Models an Unseen Language on the Fly",
+      "publication": "Findings of ACL 2024, pp. 8783–8800",
+      "url": "https://aclanthology.org/2024.findings-acl.519/"
+    },
+    {
+      "id": "robertson-2009-bm25",
+      "authors": "Stephen Robertson and Hugo Zaragoza",
+      "year": "2009",
+      "title": "The Probabilistic Relevance Framework: BM25 and Beyond",
+      "publication": "Foundations and Trends in Information Retrieval, 3(4):333–389",
+      "url": "https://doi.org/10.1561/1500000019"
+    }
+  ],
+  "handwritten": [
+    {
+      "id": "lotus-manuscript-1",
+      "image": "assets/images/lotus-underrepresented-scripts/handwritten-1.jpg",
+      "width": 4032,
+      "height": 3024,
+      "rotate": -90,
+      "caption": "手稿原图，第 1 页：论文背景、词典检索与平行示例。",
+      "caption_en": "Original notes, page 1: motivation, dictionary retrieval, and parallel examples."
+    },
+    {
+      "id": "lotus-manuscript-2",
+      "image": "assets/images/lotus-underrepresented-scripts/handwritten-2.jpg",
+      "width": 4032,
+      "height": 3024,
+      "rotate": -90,
+      "caption": "手稿原图，第 2 页：五种输入形式。对应的正文说明结合论文第 3 节与附录 F 补充。",
+      "caption_en": "Original notes, page 2: five input configurations. The body expands them using Section 3 and Appendix F."
+    }
+  ]
+}

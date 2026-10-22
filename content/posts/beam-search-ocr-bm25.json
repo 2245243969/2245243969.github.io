@@ -1,0 +1,13 @@
+{
+  "kind": "concept",
+  "handwritten": [
+    {
+      "id": "beam-search-manuscript",
+      "image": "assets/notes/beam-search-ocr-bm25/manuscript.jpg",
+      "width": 4284,
+      "height": 5712,
+      "caption": "手稿原图：Beam Search、OCR Tool 与 BM25。",
+      "caption_en": "Original handwritten notes on beam search, OCR, and BM25."
+    }
+  ]
+}
