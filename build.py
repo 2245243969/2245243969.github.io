@@ -222,7 +222,8 @@ def paper_figure(figure: dict, prefix: str) -> str:
     if figure.get('rotate') == -90:
         width, height = int(figure['width']), int(figure['height'])
         wrapper = f'class="figure-image quarter-turn" style="aspect-ratio:{height}/{width};--scan-width:{100 * width / height:.6f}%"'
-    return f'''<figure class="paper-figure" id="{ESC(figure['id'], quote=True)}"><div {wrapper}><img src="{src}" alt="{caption} / {caption_en}" width="{figure['width']}" height="{figure['height']}" loading="lazy"></div><figcaption>{caption}<span class="translation" lang="en">{caption_en}</span>{source}</figcaption></figure>'''
+    figure_style = f' style="max-width:{int(figure["max_width"])}px;margin-inline:auto"' if figure.get('max_width') else ''
+    return f'''<figure class="paper-figure" id="{ESC(figure['id'], quote=True)}"{figure_style}><div {wrapper}><img src="{src}" alt="{caption} / {caption_en}" width="{figure['width']}" height="{figure['height']}" loading="lazy"></div><figcaption>{caption}<span class="translation" lang="en">{caption_en}</span>{source}</figcaption></figure>'''
 
 
 def paper_metadata(paper: dict) -> str:
@@ -366,7 +367,7 @@ def build(destination: Path) -> None:
         parent = '../index.html' if section == 'life' else '../../' + BLOG_CATEGORIES[post['category']]
         paper = post.get('paper')
         content = markdown(post['body'], '../../', paper.get('figures') if paper else None)
-        if paper and paper.get('kind') != 'concept':
+        if paper and paper.get('kind') not in ('concept', 'musing'):
             originals = ''.join(paper_figure(figure, '../../') for figure in paper['handwritten'])
             content = paper_metadata(paper) + '<section class="notes-original" aria-labelledby="notes-title"><h2 id="notes-title">笔记正文 · <span lang="en">Notes</span></h2>' + content + '</section>' + paper_references(paper) + '<section class="handwritten-originals" aria-labelledby="handwritten-title"><h2 id="handwritten-title">手稿原图 · <span lang="en">Original Handwritten Notes</span></h2>' + originals + '</section>'
         elif paper:

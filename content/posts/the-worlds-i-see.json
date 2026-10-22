@@ -1,0 +1,25 @@
+{
+  "kind": "musing",
+  "figures": {
+    "book-cover": {
+      "id": "book-cover",
+      "image": "assets/images/the-worlds-i-see/book-cover.jpg",
+      "caption": "李飞飞《The Worlds I See》书封。",
+      "caption_en": "The Worlds I See by Fei-Fei Li.",
+      "width": 1280,
+      "height": 1707,
+      "max_width": 360
+    }
+  },
+  "handwritten": [
+    {
+      "id": "manuscript",
+      "image": "assets/images/the-worlds-i-see/manuscript.jpg",
+      "caption": "手写原稿，2026 年 10 月 22 日 10:16。",
+      "caption_en": "Original handwritten note, October 22, 2026, 10:16.",
+      "width": 1280,
+      "height": 1707,
+      "rotate": -90
+    }
+  ]
+}
