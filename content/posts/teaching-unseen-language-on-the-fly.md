@@ -1,13 +1,13 @@
 ---
 title: Teaching Large Language Models an Unseen Language on the Fly
-date: 2026-10-25
+date: 2026-10-15
 category: 论文精读
 summary: 论文阅读笔记：DIPMT、DIPMT++、词汇覆盖率与融入句法信息的示例。
 summary_en: Reading notes on DIPMT, DIPMT++, lexical coverage, and syntactically-informed exemplars.
 draft: false
 ---
 
-2026/10/25 16:57
+2026/10/15 16:57
 
 《Teaching Large Language Models an Unseen Language on the Fly》
 
